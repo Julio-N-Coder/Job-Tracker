@@ -29,14 +29,14 @@ public class JobController {
   }
 
   @GetMapping("/jobs")
-  public List<Job> getJobs(@RequestParam String param) {
+  public List<Job> getJobs() {
       // add pagination later with just jdbcClient using raw sql
       // or maybe with jdbcTemplate
       return jobRepository.findAll();
   }
 
   @GetMapping("/job/{id}")
-  public ResponseEntity<Job> getMethodName(@RequestParam String id) {
+  public ResponseEntity<Job> getJobById(@RequestParam String id) {
     Optional<Job> job = jobRepository.findById(id);
     if (job.isEmpty()) {
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
@@ -47,7 +47,7 @@ public class JobController {
   
 
   @PostMapping("/job")
-  public void postMethodName(@RequestBody RequestJob requestJob) {
+  public void addNewJob(@RequestBody RequestJob requestJob) {
     // sanatize input and return ResponseEntity. make method for it RequuestJob sanitation
       Job newJob = new Job(UUID.randomUUID().toString(),
                             requestJob.jobTitle(),
@@ -58,8 +58,8 @@ public class JobController {
       jobRepository.save(newJob);
   }
 
-  @PutMapping("job/{id}")
-  public ResponseEntity<Void> putMethodName(@PathVariable String id, @RequestBody RequestJob requestJob) {
+  @PutMapping("/job/{id}")
+  public ResponseEntity<Void> updateJob(@PathVariable String id, @RequestBody RequestJob requestJob) {
       // sanatize input
       Optional<Job> oldJobOptional = jobRepository.findById(id);
       if (oldJobOptional.isEmpty()) {
