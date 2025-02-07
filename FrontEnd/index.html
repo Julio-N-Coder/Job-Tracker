@@ -1,17 +1,20 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en" data-theme="">
   <head>
     <meta charset="UTF-8" />
     <!-- <link rel="icon" type="image/svg+xml" href="/vite.svg" /> -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Job Tracker</title>
     <script>
-      if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+      if (
+        localStorage.theme === "dark" ||
+        window.matchMedia("(prefers-color-scheme: dark)").matches
+      ) {
         localStorage.theme = "dark";
-        document.getElementsByClassName("dark")[0].className = "dark";
+        document.querySelector("html").dataset.theme = "dark";
       } else {
         localStorage.theme = "light";
-        document.getElementsByClassName("dark")[0].className = "";
+        document.querySelector("html").dataset.theme = "light";
       }
     </script>
   </head>

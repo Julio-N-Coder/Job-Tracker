@@ -6,7 +6,7 @@ function App() {
   return (
     <>
       <button
-        className="border rounded-md dark:bg-amber-300"
+        className="btn btn-primary"
         onClick={() => setCount((count) => count + 1)}
       >
         count is {count}
