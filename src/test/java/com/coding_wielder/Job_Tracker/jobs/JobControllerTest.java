@@ -59,8 +59,7 @@ public class JobControllerTest {
   void shouldReturnJob() throws Exception {
     findByIdMock();
 
-    mvc.perform(get("/job/{id}", id)
-        .param("id", id.toString()))
+    mvc.perform(get("/job/{id}", id))
           .andExpect(status().isOk())
           .andExpect(jsonPath("$.id").value(id.toString()))
           .andExpect(jsonPath("$.jobTitle").value(jobs.get(0).jobTitle()));
@@ -71,14 +70,12 @@ public class JobControllerTest {
     findByIdMock();
 
     mvc.perform(get("/job/{id}", id)
-      .param("id", id.toString())
       .contentType(MediaType.APPLICATION_JSON)
       .content(objectMapper.writeValueAsString(requestJob)))
         .andExpect(status().isOk());
     
     when(jobRepository.findById(id)).thenReturn(Optional.empty());
     mvc.perform(get("/job/{id}", id)
-      .param("id", id.toString())
       .contentType(MediaType.APPLICATION_JSON)
       .content(objectMapper.writeValueAsString(requestJob)))
         .andExpect(status().isNotFound());

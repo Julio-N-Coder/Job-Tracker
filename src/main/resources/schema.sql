@@ -5,3 +5,9 @@ CREATE TABLE IF NOT EXISTS jobs (
   status VARCHAR(255) NOT NULL,
   applied_date TIMESTAMP NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS users (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  username VARCHAR(30) UNIQUE NOT NULL,
+  hashed_password VARCHAR(50) NOT NULL
+);
