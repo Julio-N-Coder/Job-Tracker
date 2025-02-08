@@ -36,7 +36,7 @@ public class JobController {
   }
 
   @GetMapping("/job/{id}")
-  public ResponseEntity<Job> getJobById(@RequestParam String id) {
+  public ResponseEntity<Job> getJobById(@RequestParam UUID id) {
     Optional<Job> job = jobRepository.findById(id);
     if (job.isEmpty()) {
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
@@ -49,7 +49,7 @@ public class JobController {
   @PostMapping("/job")
   public void addNewJob(@RequestBody RequestJob requestJob) {
     // sanatize input and return ResponseEntity. make method for it RequuestJob sanitation
-      Job newJob = new Job(UUID.randomUUID().toString(),
+      Job newJob = new Job(null,
                             requestJob.jobTitle(),
                             requestJob.company(),
                             requestJob.status(),
@@ -59,7 +59,7 @@ public class JobController {
   }
 
   @PutMapping("/job/{id}")
-  public ResponseEntity<Void> updateJob(@PathVariable String id, @RequestBody RequestJob requestJob) {
+  public ResponseEntity<Void> updateJob(@PathVariable UUID id, @RequestBody RequestJob requestJob) {
       // sanatize input
       Optional<Job> oldJobOptional = jobRepository.findById(id);
       if (oldJobOptional.isEmpty()) {
@@ -67,14 +67,13 @@ public class JobController {
       }
       Job oldJob = oldJobOptional.get();
 
-      jobRepository.deleteById(id);
       jobRepository.save(new Job(id, requestJob.jobTitle(), requestJob.company(), requestJob.status(), oldJob.appliedDate()));
       return ResponseEntity.ok().build();
   }
 
   @ResponseStatus(HttpStatus.NO_CONTENT)
   @DeleteMapping("/job/{id}")
-  public void deleteJob(@RequestParam String id) {
+  public void deleteJob(@PathVariable UUID id) {
     jobRepository.deleteById(id);
   }
 }
@@ -88,7 +87,7 @@ record RequestJob(
 @Table("jobs")
 record Job(
   @Id
-  String id,
+  UUID id,
   String jobTitle,
   String company,
   String status,

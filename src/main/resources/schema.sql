@@ -1,8 +1,7 @@
-CREATE TABLE IF NOT EXISTS jobs (
-  id VARCHAR(50) NOT NULL,
-  jobTitle VARCHAR(255) NOT NULL,
+CREATE TABLE IF NOT EXISTS jobs ( 
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  job_title VARCHAR(255) NOT NULL,
   company VARCHAR(255) NOT NULL,
   status VARCHAR(255) NOT NULL,
-  appliedDate VARCHAR(50) NOT NULL,
-  PRIMARY KEY(id)
+  applied_date TIMESTAMP NOT NULL
 );

@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -33,7 +34,7 @@ public class JobControllerTest {
 
   private final List<Job> jobs = new ArrayList<>();
   private final RequestJob requestJob = new RequestJob("new title", "new company", "Senior Web Devloper");
-  private final String id = "1234";
+  private final UUID id = UUID.fromString("11111111-1111-1111-1111-111111111111");
 
   @BeforeEach
   void setup() {
@@ -59,9 +60,9 @@ public class JobControllerTest {
     findByIdMock();
 
     mvc.perform(get("/job/{id}", id)
-        .param("id", id))
+        .param("id", id.toString()))
           .andExpect(status().isOk())
-          .andExpect(jsonPath("$.id").value(id))
+          .andExpect(jsonPath("$.id").value(id.toString()))
           .andExpect(jsonPath("$.jobTitle").value(jobs.get(0).jobTitle()));
   }
 
@@ -70,14 +71,14 @@ public class JobControllerTest {
     findByIdMock();
 
     mvc.perform(get("/job/{id}", id)
-      .param("id", id)
+      .param("id", id.toString())
       .contentType(MediaType.APPLICATION_JSON)
       .content(objectMapper.writeValueAsString(requestJob)))
         .andExpect(status().isOk());
     
     when(jobRepository.findById(id)).thenReturn(Optional.empty());
     mvc.perform(get("/job/{id}", id)
-      .param("id", id)
+      .param("id", id.toString())
       .contentType(MediaType.APPLICATION_JSON)
       .content(objectMapper.writeValueAsString(requestJob)))
         .andExpect(status().isNotFound());
