@@ -3,8 +3,6 @@ package com.coding_wielder.Job_Tracker.users;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.relational.core.mapping.Table;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -42,12 +40,4 @@ public class UserController {
 record RequestUser(
   String username,
   String password
-) {}
-
-@Table("users")
-record User(
-  @Id
-  UUID id,
-  String username,
-  String hashedPassword
 ) {}

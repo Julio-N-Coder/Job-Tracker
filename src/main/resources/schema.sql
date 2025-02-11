@@ -8,6 +8,6 @@ CREATE TABLE IF NOT EXISTS jobs (
 
 CREATE TABLE IF NOT EXISTS users (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  username VARCHAR(30) UNIQUE NOT NULL,
-  hashed_password VARCHAR(50) NOT NULL
+  username VARCHAR(30) UNIQUE NOT NULL PRIMARY KEY,
+  hashed_password VARCHAR(500) NOT NULL
 );
