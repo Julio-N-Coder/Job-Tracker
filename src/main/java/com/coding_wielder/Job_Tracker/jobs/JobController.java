@@ -6,10 +6,14 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.web.bind.annotation.RestController;
+
+import com.coding_wielder.Job_Tracker.security.CustomUserDetails;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -25,6 +29,10 @@ public class JobController {
 
   JobController(JobRepository jobRepository) {
     this.jobRepository = jobRepository;
+  }
+
+  private UUID getPrinciple() {
+    return ((CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId();
   }
 
   @GetMapping("/jobs")
@@ -52,7 +60,8 @@ public class JobController {
                             requestJob.jobTitle(),
                             requestJob.company(),
                             requestJob.status(),
-                            LocalDateTime.now()
+                            LocalDateTime.now(),
+                            getPrinciple()
                           );
       jobRepository.save(newJob);
   }
@@ -66,7 +75,14 @@ public class JobController {
       }
       Job oldJob = oldJobOptional.get();
 
-      jobRepository.save(new Job(id, requestJob.jobTitle(), requestJob.company(), requestJob.status(), oldJob.appliedDate()));
+      jobRepository.save(new Job(
+        id, 
+        requestJob.jobTitle(), 
+        requestJob.company(), 
+        requestJob.status(), 
+        oldJob.appliedDate(),
+        getPrinciple()
+      ));
       return ResponseEntity.ok().build();
   }
 
@@ -90,6 +106,7 @@ record Job(
   String jobTitle,
   String company,
   String status,
-  LocalDateTime appliedDate
+  LocalDateTime appliedDate,
+  UUID userId
 ) {
 }

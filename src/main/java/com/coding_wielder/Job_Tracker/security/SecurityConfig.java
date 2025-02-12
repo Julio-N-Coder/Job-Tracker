@@ -22,10 +22,10 @@ public class SecurityConfig {
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     http.authorizeHttpRequests((authorize) -> authorize
-      .requestMatchers("/auth/**").permitAll()
-      .anyRequest().authenticated()
+    .requestMatchers("/auth/**").permitAll()
+    .anyRequest().authenticated()
     )
-    .addFilterBefore(jwtFilter, AnonymousAuthenticationFilter.class);
+    .addFilterAfter(jwtFilter, AnonymousAuthenticationFilter.class);
 
     return http.build();
   }

@@ -21,6 +21,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+// having problem with this loading auth stuff as well
 @WebMvcTest(JobController.class)
 public class JobControllerTest {
   @Autowired
@@ -35,10 +36,11 @@ public class JobControllerTest {
   private final List<Job> jobs = new ArrayList<>();
   private final RequestJob requestJob = new RequestJob("new title", "new company", "Senior Web Devloper");
   private final UUID id = UUID.fromString("11111111-1111-1111-1111-111111111111");
+  private final UUID userId = UUID.fromString("11111111-1111-1111-1111-111111111112");
 
   @BeforeEach
   void setup() {
-    Job newJob = new Job(id, "fake title", "fake company", "Junior Web Developer", LocalDateTime.now());
+    Job newJob = new Job(id, "fake title", "fake company", "Junior Web Developer", LocalDateTime.now(), userId);
     jobs.add(newJob);
   }
 

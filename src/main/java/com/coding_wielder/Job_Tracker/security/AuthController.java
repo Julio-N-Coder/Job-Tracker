@@ -47,6 +47,7 @@ public class AuthController {
   public ResponseEntity<String> login(@RequestBody AuthRequest userData) {
     String userName = userData.username();
     String password = userData.password();
+    System.out.println("hit login route");
 
     if (validate(userName, password)) {
       return ResponseEntity.badRequest().body("Invalid Data");
@@ -67,6 +68,7 @@ public class AuthController {
   public ResponseEntity<String> signup(@RequestBody AuthRequest userData) {
     String userName = userData.username();
     String password = userData.password();
+    System.out.println("hit signup route");
 
     if (validate(userName, password)) {
       return ResponseEntity.badRequest().body("Invalid Data");
