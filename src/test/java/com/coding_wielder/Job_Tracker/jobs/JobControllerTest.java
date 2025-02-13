@@ -11,6 +11,7 @@ import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -19,10 +20,12 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.coding_wielder.Job_Tracker.security.CustomUserDetailsService;
+import com.coding_wielder.Job_Tracker.security.JwtUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-// having problem with this loading auth stuff as well
 @WebMvcTest(JobController.class)
+@AutoConfigureMockMvc(addFilters = false) // does not load security filters
 public class JobControllerTest {
   @Autowired
   MockMvc mvc;
@@ -32,6 +35,11 @@ public class JobControllerTest {
 
   @MockitoBean
   JobRepository jobRepository;
+  // so filters don't load
+  @MockitoBean
+  private JwtUtil jwtUtil;
+  @MockitoBean
+  private CustomUserDetailsService customUserDetailsService;
 
   private final List<Job> jobs = new ArrayList<>();
   private final RequestJob requestJob = new RequestJob("new title", "new company", "Senior Web Devloper");

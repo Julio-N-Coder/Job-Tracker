@@ -49,7 +49,7 @@ public class AuthController {
     String password = userData.password();
     System.out.println("hit login route");
 
-    if (validate(userName, password)) {
+    if (!validate(userName, password)) {
       return ResponseEntity.badRequest().body("Invalid Data");
     }
 

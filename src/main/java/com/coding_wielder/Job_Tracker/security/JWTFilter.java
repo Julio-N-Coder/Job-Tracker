@@ -36,6 +36,7 @@ public class JWTFilter extends OncePerRequestFilter {
       response.getWriter().write("Missing or invalid Authorization header");
       return;
     }
+    System.out.println("Is Filter After Bear");
 
     String token = authorizationHeader.substring(7);
     UUID id;
@@ -58,5 +59,11 @@ public class JWTFilter extends OncePerRequestFilter {
     }
 
     chain.doFilter(request, response);
+  }
+
+  @Override
+  protected boolean shouldNotFilter(HttpServletRequest request) {
+      String path = request.getServletPath();
+      return path.startsWith("/auth/");
   }
 }

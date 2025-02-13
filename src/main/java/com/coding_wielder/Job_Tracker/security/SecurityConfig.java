@@ -25,6 +25,7 @@ public class SecurityConfig {
     .requestMatchers("/auth/**").permitAll()
     .anyRequest().authenticated()
     )
+    .csrf(csrf -> csrf.disable())
     .addFilterAfter(jwtFilter, AnonymousAuthenticationFilter.class);
 
     return http.build();
