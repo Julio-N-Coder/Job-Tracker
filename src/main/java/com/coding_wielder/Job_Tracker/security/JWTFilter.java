@@ -28,7 +28,6 @@ public class JWTFilter extends OncePerRequestFilter {
   
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
-    System.out.println("Filter is running");
     String authorizationHeader = request.getHeader("Authorization");
 
     if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
@@ -36,7 +35,6 @@ public class JWTFilter extends OncePerRequestFilter {
       response.getWriter().write("Missing or invalid Authorization header");
       return;
     }
-    System.out.println("Is Filter After Bear");
 
     String token = authorizationHeader.substring(7);
     UUID id;
@@ -48,15 +46,13 @@ public class JWTFilter extends OncePerRequestFilter {
       return;
     }
 
-    if (id != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-      CustomUserDetails customUserDetails = customUserDetailsService.loadUserById(id);
+    CustomUserDetails customUserDetails = customUserDetailsService.loadUserById(id);
 
-      UsernamePasswordAuthenticationToken authToken =
-              new UsernamePasswordAuthenticationToken(customUserDetails, null, customUserDetails.getAuthorities());
+    UsernamePasswordAuthenticationToken authToken =
+            new UsernamePasswordAuthenticationToken(customUserDetails, null, customUserDetails.getAuthorities());
 
-      authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-      SecurityContextHolder.getContext().setAuthentication(authToken);
-    }
+    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+    SecurityContextHolder.getContext().setAuthentication(authToken);
 
     chain.doFilter(request, response);
   }

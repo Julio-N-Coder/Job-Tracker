@@ -7,13 +7,12 @@ import java.util.UUID;
 
 import org.springframework.web.bind.annotation.RestController;
 
-import com.coding_wielder.Job_Tracker.security.CustomUserDetails;
+import com.coding_wielder.Job_Tracker.lib.Lib;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -26,25 +25,22 @@ import org.springframework.web.bind.annotation.PathVariable;
 public class JobController {
 
   private final JobRepository jobRepository;
+  private final Lib lib;
 
-  JobController(JobRepository jobRepository) {
+  JobController(JobRepository jobRepository, Lib lib) {
     this.jobRepository = jobRepository;
-  }
-
-  private UUID getPrinciple() {
-    return ((CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId();
+    this.lib = lib;
   }
 
   @GetMapping("/jobs")
   public List<Job> getJobs() {
-      // add pagination later with just jdbcClient using raw sql
-      // or maybe with jdbcTemplate
-      return jobRepository.findAll();
+    // add pagination later with just jdbcClient using raw sql
+    return jobRepository.findByUserId(lib.getPrinciple());
   }
 
   @GetMapping("/job/{id}")
   public ResponseEntity<Job> getJobById(@PathVariable UUID id) {
-    Optional<Job> job = jobRepository.findById(id);
+    Optional<Job> job = jobRepository.findByIdAndByUserId(id, lib.getPrinciple());
     if (job.isEmpty()) {
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
@@ -61,7 +57,7 @@ public class JobController {
                             requestJob.company(),
                             requestJob.status(),
                             LocalDateTime.now(),
-                            getPrinciple()
+                            lib.getPrinciple()
                           );
       jobRepository.save(newJob);
   }
@@ -69,7 +65,7 @@ public class JobController {
   @PutMapping("/job/{id}")
   public ResponseEntity<Void> updateJob(@PathVariable UUID id, @RequestBody RequestJob requestJob) {
       // sanatize input
-      Optional<Job> oldJobOptional = jobRepository.findById(id);
+      Optional<Job> oldJobOptional = jobRepository.findByIdAndByUserId(id, lib.getPrinciple());
       if (oldJobOptional.isEmpty()) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
       }
@@ -81,7 +77,7 @@ public class JobController {
         requestJob.company(), 
         requestJob.status(), 
         oldJob.appliedDate(),
-        getPrinciple()
+        lib.getPrinciple()
       ));
       return ResponseEntity.ok().build();
   }
@@ -89,7 +85,7 @@ public class JobController {
   @ResponseStatus(HttpStatus.NO_CONTENT)
   @DeleteMapping("/job/{id}")
   public void deleteJob(@PathVariable UUID id) {
-    jobRepository.deleteById(id);
+    jobRepository.deleteByIdAndByUserId(id, lib.getPrinciple());
   }
 }
 

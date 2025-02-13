@@ -17,8 +17,10 @@ public class JwtUtil {
   
   private static final long EXPIRATION_TIME = 1000 * 60 * 60; // 1 hour
   // Temporary for development for the time (Make sure to use actual keys later)
+  // (first check if jjwt supports it) switch to Ed25519 algorithm. builder: Jwks.CRV.Ed25519.keyPair()
   SignatureAlgorithm alg = Jwts.SIG.ES256;
   private final KeyPair keyPair = alg.keyPair().build();
+  // private final KeyPair keyPair = Jwks.CRV.Ed25519.keyPair().build();
 
   public String generateToken(UUID id) {
     return Jwts.builder()
