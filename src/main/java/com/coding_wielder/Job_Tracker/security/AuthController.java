@@ -3,6 +3,7 @@ package com.coding_wielder.Job_Tracker.security;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -54,10 +55,14 @@ public class AuthController {
 
     Optional<User> userOptional = userRepository.findByUsername(userName);
     if (userOptional.isEmpty()) {
-      return ResponseEntity.badRequest().body("User not found");
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
+
     User user = userOptional.get();
-      
+    if (!passwordEncoder.matches(password, user.hashedPassword())) {
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
+
     String token = jwtUtil.generateToken(user.id());
     return ResponseEntity.ok(token);
   }

@@ -9,8 +9,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.coding_wielder.Job_Tracker.lib.Lib;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.relational.core.mapping.Table;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -94,15 +92,3 @@ record RequestJob(
   String company,
   String status
 ) {}
-
-@Table("jobs")
-record Job(
-  @Id
-  UUID id,
-  String jobTitle,
-  String company,
-  String status,
-  LocalDateTime appliedDate,
-  UUID userId
-) {
-}
