@@ -22,7 +22,6 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.SignatureAlgorithm;
 import jakarta.annotation.PostConstruct;
 
-// Later implement token generation for refresh token and normal token
 @Component
 public class JwtUtil {
   

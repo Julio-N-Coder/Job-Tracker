@@ -5,6 +5,7 @@ target/
 !**/src/test/**/target/
 NOTES.md
 keys/*
+!keys/.gitkeep
 
 ### STS ###
 .apt_generated
