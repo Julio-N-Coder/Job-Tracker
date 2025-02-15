@@ -4,6 +4,7 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 NOTES.md
+keys/*
 
 ### STS ###
 .apt_generated

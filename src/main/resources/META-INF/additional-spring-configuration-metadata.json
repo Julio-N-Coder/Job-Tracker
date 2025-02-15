@@ -1,0 +1,5 @@
+{"properties": [{
+  "name": "key.file.path",
+  "type": "java.lang.String",
+  "description": "This is the folder path to the public and private keys 'key.file.path'"
+}]}
