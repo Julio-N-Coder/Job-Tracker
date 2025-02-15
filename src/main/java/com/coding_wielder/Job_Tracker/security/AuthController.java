@@ -83,11 +83,16 @@ public class AuthController {
 
     // store new user
     UUID id = UUID.randomUUID();
-    jdbcClient.sql("INSERT INTO users (id, username, hashed_password) VALUES (:id, :username, :password)")
+    int rowsAffected = jdbcClient.sql("INSERT INTO users (id, username, hashed_password) VALUES (:id, :username, :password)")
       .param("id", id)
       .param("username", userName)
       .param("password", passwordEncoder.encode(password))
       .update();
+    
+    if (rowsAffected < 1) {
+      return ResponseEntity.internalServerError().build();
+    }
+
     String token = jwtUtil.generateToken(id);
     
     return ResponseEntity.ok(token);
