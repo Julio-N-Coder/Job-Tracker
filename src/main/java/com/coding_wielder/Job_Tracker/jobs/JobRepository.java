@@ -11,8 +11,7 @@ import org.springframework.data.repository.query.Param;
 
 public interface JobRepository extends ListCrudRepository<Job, UUID> {
 
-  @Query("SELECT * FROM jobs WHERE id=:id AND user_id=:userId")
-  public Optional<Job> findByIdAndByUserId(@Param("id") UUID id, @Param("userId") UUID userId);
+  public Optional<Job> findByIdAndUserId(UUID id, UUID userId);
 
   @Modifying
   @Query("DELETE FROM jobs WHERE id=:id AND user_id=:userId")

@@ -38,7 +38,7 @@ public class JobControllerTest extends BaseControllerTestUnit {
   }
 
   private void findByIdAndByUserIdMock() {
-    when(jobRepository.findByIdAndByUserId(jobId, userId)).thenReturn(Optional.of(jobs.get(0)));
+    when(jobRepository.findByIdAndUserId(jobId, userId)).thenReturn(Optional.of(jobs.get(0)));
   }
 
   @Test
@@ -70,7 +70,7 @@ public class JobControllerTest extends BaseControllerTestUnit {
       .content(objectMapper.writeValueAsString(requestJob)))
         .andExpect(status().isOk());
     
-    when(jobRepository.findByIdAndByUserId(jobId, userId)).thenReturn(Optional.empty());
+    when(jobRepository.findByIdAndUserId(jobId, userId)).thenReturn(Optional.empty());
     mvc.perform(get("/job/{id}", jobId).header("Authorization", "Bearer " + token)
       .contentType(MediaType.APPLICATION_JSON)
       .content(objectMapper.writeValueAsString(requestJob)))

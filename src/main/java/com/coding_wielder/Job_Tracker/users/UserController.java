@@ -1,28 +1,31 @@
 package com.coding_wielder.Job_Tracker.users;
 
 import java.util.Optional;
-import java.util.UUID;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+
+import com.coding_wielder.Job_Tracker.lib.Lib;
 
 
 @RestController
+@RequestMapping("/user")
 public class UserController {
 
   private final UserRepository userRepository;
+  private final Lib lib;
 
-  UserController(UserRepository userRepository) {
+  UserController(UserRepository userRepository, Lib lib) {
     this.userRepository = userRepository;
+    this.lib = lib;
   }
   
-  @GetMapping("/user/{id}")
-  public ResponseEntity<User> getUser(@PathVariable UUID id) {
-    Optional<User> userOptional = userRepository.findById(id);
+  @GetMapping("")
+  public ResponseEntity<User> getUser() {
+    Optional<User> userOptional = userRepository.findById(lib.getPrinciple());
     if (userOptional.isEmpty()) {
       return ResponseEntity.notFound().build();
     }
@@ -31,10 +34,17 @@ public class UserController {
     return ResponseEntity.ok(user);
   }
 
-  @PostMapping("/user")
-  public void makeUser(@RequestBody RequestUser requestUser) {
-      //TODO: process POST request
+  @DeleteMapping("")
+  public ResponseEntity<Void> deleteUserAccount() {
+    // check token type once refresh token is added
+    int rowsAffectd = userRepository.deleteByIdWithFeedback(lib.getPrinciple());
+    if (rowsAffectd < 1) {
+      ResponseEntity.internalServerError();
+    }
+
+    return ResponseEntity.ok().build();
   }
+  
 }
 
 record RequestUser(

@@ -33,6 +33,7 @@ public class JwtUtil {
   }
 
   public String generateToken(UUID id) {
+    // add token_use claim for normal and refresh token
     return Jwts.builder()
       .subject(id.toString())
       .issuedAt(new Date())

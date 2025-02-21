@@ -53,7 +53,7 @@ public class JobController {
 
   @GetMapping("/job/{id}")
   public ResponseEntity<Job> getJobById(@PathVariable UUID id) {
-    Optional<Job> job = jobRepository.findByIdAndByUserId(id, lib.getPrinciple());
+    Optional<Job> job = jobRepository.findByIdAndUserId(id, lib.getPrinciple());
     if (job.isEmpty()) {
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
@@ -85,7 +85,7 @@ public class JobController {
       return ResponseEntity.badRequest().build();
     }
 
-    Optional<Job> oldJobOptional = jobRepository.findByIdAndByUserId(id, lib.getPrinciple());
+    Optional<Job> oldJobOptional = jobRepository.findByIdAndUserId(id, lib.getPrinciple());
     if (oldJobOptional.isEmpty()) {
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
