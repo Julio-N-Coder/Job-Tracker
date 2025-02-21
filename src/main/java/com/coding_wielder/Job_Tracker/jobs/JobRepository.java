@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.springframework.data.jdbc.repository.query.Modifying;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.ListCrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -13,8 +14,9 @@ public interface JobRepository extends ListCrudRepository<Job, UUID> {
   @Query("SELECT * FROM jobs WHERE id=:id AND user_id=:userId")
   public Optional<Job> findByIdAndByUserId(@Param("id") UUID id, @Param("userId") UUID userId);
 
+  @Modifying
   @Query("DELETE FROM jobs WHERE id=:id AND user_id=:userId")
-  public void deleteByIdAndByUserId(@Param("id") UUID id, @Param("userId") UUID userId);
+  public int deleteByIdAndUserId(@Param("id") UUID id, @Param("userId") UUID userId);
 
   List<Job> findByUserId(UUID userId);
 

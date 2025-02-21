@@ -97,6 +97,8 @@ public class AuthController {
     
     return ResponseEntity.ok(token);
   }
+
+  // add refresh token method here
 }
 
 record AuthRequest(String username, String password) {}

@@ -13,7 +13,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -28,6 +27,22 @@ public class JobController {
   JobController(JobRepository jobRepository, Lib lib) {
     this.jobRepository = jobRepository;
     this.lib = lib;
+  }
+
+  private boolean jobSanitation(RequestJob requestJob) {
+    String company = requestJob.company();
+    String jobTitle = requestJob.jobTitle();
+    String status = requestJob.status();
+
+    if (
+      company == null || jobTitle == null || status == null || 
+      company.length() < 1 || jobTitle.length() < 1 || status.length() < 1 || 
+      company.length() > 255 || jobTitle.length() > 255 || status.length() > 255
+      ) {
+      return false;
+    }
+
+    return true;
   }
 
   @GetMapping("/jobs")
@@ -48,42 +63,55 @@ public class JobController {
   
 
   @PostMapping("/job")
-  public void addNewJob(@RequestBody RequestJob requestJob) {
-    // sanatize input and return ResponseEntity. make method for it RequuestJob sanitation
-      Job newJob = new Job(null,
-                            requestJob.jobTitle(),
-                            requestJob.company(),
-                            requestJob.status(),
-                            LocalDateTime.now(),
-                            lib.getPrinciple()
-                          );
-      jobRepository.save(newJob);
+  public ResponseEntity<Void> addNewJob(@RequestBody RequestJob requestJob) {
+    if (!jobSanitation(requestJob)) {
+      return ResponseEntity.badRequest().build();
+    }
+
+    Job newJob = new Job(null,
+                          requestJob.jobTitle(),
+                          requestJob.company(),
+                          requestJob.status(),
+                          LocalDateTime.now(),
+                          lib.getPrinciple()
+                        );
+    jobRepository.save(newJob);
+    return ResponseEntity.ok().build();
   }
 
   @PutMapping("/job/{id}")
   public ResponseEntity<Void> updateJob(@PathVariable UUID id, @RequestBody RequestJob requestJob) {
-      // sanatize input
-      Optional<Job> oldJobOptional = jobRepository.findByIdAndByUserId(id, lib.getPrinciple());
-      if (oldJobOptional.isEmpty()) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-      }
-      Job oldJob = oldJobOptional.get();
+    if (!jobSanitation(requestJob)) {
+      return ResponseEntity.badRequest().build();
+    }
 
-      jobRepository.save(new Job(
-        id, 
-        requestJob.jobTitle(), 
-        requestJob.company(), 
-        requestJob.status(), 
-        oldJob.appliedDate(),
-        lib.getPrinciple()
-      ));
-      return ResponseEntity.ok().build();
+    Optional<Job> oldJobOptional = jobRepository.findByIdAndByUserId(id, lib.getPrinciple());
+    if (oldJobOptional.isEmpty()) {
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    }
+    Job oldJob = oldJobOptional.get();
+    Job newJob = new Job(
+      id, 
+      requestJob.jobTitle(), 
+      requestJob.company(), 
+      requestJob.status(), 
+      oldJob.appliedDate(),
+      lib.getPrinciple()
+    );
+
+    jobRepository.save(newJob);
+    return ResponseEntity.ok().build();
   }
 
-  @ResponseStatus(HttpStatus.NO_CONTENT)
   @DeleteMapping("/job/{id}")
-  public void deleteJob(@PathVariable UUID id) {
-    jobRepository.deleteByIdAndByUserId(id, lib.getPrinciple());
+  public ResponseEntity<Void> deleteJob(@PathVariable UUID id) {
+    int rowsAffected = jobRepository.deleteByIdAndUserId(id, lib.getPrinciple());
+    System.out.println("Rows Affected: " + rowsAffected);
+    if (rowsAffected < 1) {
+      return ResponseEntity.badRequest().build();
+    }
+
+    return ResponseEntity.ok().build();
   }
 }
 
