@@ -1,5 +1,5 @@
 import { NavLink } from "react-router";
-// import ThemeToggle from "./ThemeToggle";
+import ThemeToggle from "./ThemeToggle";
 
 export default function Navbar() {
   return (
@@ -30,7 +30,7 @@ export default function Navbar() {
           Job Tracker
         </NavLink>
       </div>
-      {/* <ThemeToggle /> */}
+      <ThemeToggle />
     </nav>
   );
 }
