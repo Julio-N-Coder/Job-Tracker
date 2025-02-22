@@ -2,19 +2,21 @@
 <html lang="en" data-theme="">
   <head>
     <meta charset="UTF-8" />
-    <!-- <link rel="icon" type="image/svg+xml" href="/vite.svg" /> -->
+    <link rel="icon" type="image/png" href="/job-tracker-icon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Job Tracker</title>
     <script>
       // preferedTheme is theme they choose to prefer with the theme togle
       // theme is the current active theme (e.g. system default is dark but user did not set prefered them)
-      if (localStorage.preferedTheme === "dark") {
-        document.querySelector("html").dataset.theme = "dark";
-      } else if (localStorage.preferedTheme === "light") {
-        document.querySelector("html").dataset.theme = "light";
+      if (localStorage.preferedTheme) {
+        document.querySelector("html").dataset.theme =
+          localStorage.preferedTheme;
+        localStorage.theme = localStorage.preferedTheme;
       } else if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+        document.querySelector("html").dataset.theme = "dark";
         localStorage.theme = "dark";
       } else {
+        document.querySelector("html").dataset.theme = "light";
         localStorage.theme = "light";
       }
     </script>
