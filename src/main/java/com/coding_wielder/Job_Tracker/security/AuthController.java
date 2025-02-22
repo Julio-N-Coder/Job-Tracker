@@ -7,7 +7,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.coding_wielder.Job_Tracker.users.User;
@@ -17,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 
 @RestController
-@RequestMapping("/auth")
 public class AuthController {
 
   private final UserRepository userRepository;
@@ -44,7 +42,7 @@ public class AuthController {
     return true;
   }
 
-  @PostMapping("/login")
+  @PostMapping("/auth/login")
   public ResponseEntity<String> login(@RequestBody AuthRequest userData) {
     String userName = userData.username();
     String password = userData.password();
@@ -68,7 +66,7 @@ public class AuthController {
   }
   
 
-  @PostMapping("/signup")
+  @PostMapping("/auth/signup")
   public ResponseEntity<String> signup(@RequestBody AuthRequest userData) {
     String userName = userData.username();
     String password = userData.password();
@@ -98,7 +96,7 @@ public class AuthController {
     return ResponseEntity.ok(token);
   }
 
-  // add refresh token method here
+  // add refresh token method here route: "/token/refresh"
 }
 
 record AuthRequest(String username, String password) {}

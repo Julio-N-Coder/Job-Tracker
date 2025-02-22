@@ -1,3 +1,9 @@
 @import "tailwindcss";
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
-@plugin "daisyui";
+@plugin "daisyui" {
+  themes: light --default, dark --prefersdark;
+}
+
+.nav-buttons {
+  @apply ring-0 text-3xl btn btn-soft
+}
