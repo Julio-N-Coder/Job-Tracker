@@ -30,7 +30,15 @@ export default function Navbar() {
           Job Tracker
         </NavLink>
       </div>
-      <ThemeToggle />
+      <div className="space-x-4">
+        <ThemeToggle />
+        <NavLink
+          to="/login"
+          className="btn btn-accent text-2xl text-accent-content"
+        >
+          Login
+        </NavLink>
+      </div>
     </nav>
   );
 }

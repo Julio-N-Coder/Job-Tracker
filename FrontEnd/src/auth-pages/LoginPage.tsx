@@ -1,7 +1,5 @@
+import AuthLayout from "./AuthLayout";
+
 export default function LoginPage() {
-  return (
-    <div>
-        <h1>LoginPage</h1>
-    </div>
-  )
+  return <AuthLayout type="login" />;
 }

@@ -17,8 +17,13 @@ ReactDOM.createRoot(root).render(
         <Route index element={<Index />} />
         <Route path="jobs-page" element={<JobsPage />} />
         <Route path="about" element={<About />} />
-        <Route path="login" element={<LoginPage />} />
-        <Route path="signup" element={<SignUpPage />} />
+      </Route>
+      <Route
+        path="/"
+        element={<Container className="min-h-screen flex flex-col" />}
+      >
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<SignUpPage />} />
       </Route>
     </Routes>
   </BrowserRouter>
