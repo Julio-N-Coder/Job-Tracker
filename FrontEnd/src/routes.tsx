@@ -5,6 +5,8 @@ import Index from "./index.tsx";
 import Container from "./container.tsx";
 import JobsPage from "./jobs-page/JobsPage.tsx";
 import About from "./about/about.tsx";
+import LoginPage from "./auth-pages/LoginPage.tsx";
+import SignUpPage from "./auth-pages/SignUpPage.tsx";
 
 const root = document.getElementById("root") as ReactDOM.Container;
 
@@ -15,6 +17,8 @@ ReactDOM.createRoot(root).render(
         <Route index element={<Index />} />
         <Route path="jobs-page" element={<JobsPage />} />
         <Route path="about" element={<About />} />
+        <Route path="login" element={<LoginPage />} />
+        <Route path="signup" element={<SignUpPage />} />
       </Route>
     </Routes>
   </BrowserRouter>
