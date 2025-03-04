@@ -28,7 +28,7 @@ import com.coding_wielder.Job_Tracker.users.User;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@EnableAutoConfiguration(exclude = {DataSourceAutoConfiguration.class, HibernateJpaAutoConfiguration.class})
+@EnableAutoConfiguration(exclude = { DataSourceAutoConfiguration.class, HibernateJpaAutoConfiguration.class })
 public class AuthControllerTest extends BaseControllerTestUnit {
 
   private final String username = "username";
@@ -62,8 +62,8 @@ public class AuthControllerTest extends BaseControllerTestUnit {
     when(passwordEncoder.matches(password, password)).thenReturn(true);
 
     String responseBody = mvc.perform(postMethod("/auth/login"))
-      .andExpect(status().isOk())
-      .andReturn().getResponse().getContentAsString();
+        .andExpect(status().isOk())
+        .andReturn().getResponse().getContentAsString();
 
     assertEquals(responseBody, token);
   }
@@ -79,8 +79,8 @@ public class AuthControllerTest extends BaseControllerTestUnit {
     when(passwordEncoder.encode(password)).thenReturn(password);
 
     String responseBody = mvc.perform(postMethod("/auth/signup"))
-      .andExpect(status().isOk())
-      .andReturn().getResponse().getContentAsString();
+        .andExpect(status().isOk())
+        .andReturn().getResponse().getContentAsString();
 
     assertEquals(responseBody, token);
   }

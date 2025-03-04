@@ -19,13 +19,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 @WebMvcTest(UserController.class)
 public class UserControllerTest {
-  
+
   @Autowired
   private MockMvc mockMvc;
 
   @Autowired
   private ObjectMapper objectMapper;
-  
+
   @MockitoBean
   private UserRepository userRepository;
 
@@ -39,16 +39,14 @@ public class UserControllerTest {
 
     mockMvc.perform(get("/user/{id}", id)
         .contentType(MediaType.APPLICATION_JSON)
-        .content(oneUserJson)
-      ).andExpect(status().isOk())
-      .andExpect(jsonPath("$.id").value(id.toString()));
-    
+        .content(oneUserJson)).andExpect(status().isOk())
+        .andExpect(jsonPath("$.id").value(id.toString()));
+
     when(userRepository.findById(id)).thenReturn(Optional.empty());
 
     mockMvc.perform(get("/user/{id}", id)
         .contentType(MediaType.APPLICATION_JSON)
-        .content(oneUserJson)
-      ).andExpect(status().isNotFound());
+        .content(oneUserJson)).andExpect(status().isNotFound());
   }
 
 }

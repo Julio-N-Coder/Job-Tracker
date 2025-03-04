@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.coding_wielder.Job_Tracker.lib.Lib;
 
-
 @RestController
 @RequestMapping("/user")
 public class UserController {
@@ -22,7 +21,7 @@ public class UserController {
     this.userRepository = userRepository;
     this.lib = lib;
   }
-  
+
   @GetMapping("")
   public ResponseEntity<User> getUser() {
     Optional<User> userOptional = userRepository.findById(lib.getPrinciple());
@@ -44,10 +43,10 @@ public class UserController {
 
     return ResponseEntity.ok().build();
   }
-  
+
 }
 
 record RequestUser(
-  String username,
-  String password
-) {}
+    String username,
+    String password) {
+}

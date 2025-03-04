@@ -14,7 +14,7 @@ import com.coding_wielder.Job_Tracker.users.UserRepository;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-
+// routes prefixed with /auth/ will not go through jwt security filter
 @RestController
 public class AuthController {
 
@@ -22,12 +22,13 @@ public class AuthController {
   private final PasswordEncoder passwordEncoder;
   private final JwtUtil jwtUtil;
   private final JdbcClient jdbcClient;
-  
-  public AuthController(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtUtil jwtUtil, JdbcClient jdbcClient) {
-      this.userRepository = userRepository;
-      this.passwordEncoder = passwordEncoder;
-      this.jwtUtil = jwtUtil;
-      this.jdbcClient = jdbcClient;
+
+  public AuthController(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtUtil jwtUtil,
+      JdbcClient jdbcClient) {
+    this.userRepository = userRepository;
+    this.passwordEncoder = passwordEncoder;
+    this.jwtUtil = jwtUtil;
+    this.jdbcClient = jdbcClient;
   }
 
   private boolean validate(String userName, String password) {
@@ -64,7 +65,6 @@ public class AuthController {
     String token = jwtUtil.generateToken(user.id());
     return ResponseEntity.ok(token);
   }
-  
 
   @PostMapping("/auth/signup")
   public ResponseEntity<String> signup(@RequestBody AuthRequest userData) {
@@ -81,22 +81,24 @@ public class AuthController {
 
     // store new user
     UUID id = UUID.randomUUID();
-    int rowsAffected = jdbcClient.sql("INSERT INTO users (id, username, hashed_password) VALUES (:id, :username, :password)")
-      .param("id", id)
-      .param("username", userName)
-      .param("password", passwordEncoder.encode(password))
-      .update();
-    
+    int rowsAffected = jdbcClient
+        .sql("INSERT INTO users (id, username, hashed_password) VALUES (:id, :username, :password)")
+        .param("id", id)
+        .param("username", userName)
+        .param("password", passwordEncoder.encode(password))
+        .update();
+
     if (rowsAffected < 1) {
       return ResponseEntity.internalServerError().build();
     }
 
     String token = jwtUtil.generateToken(id);
-    
+
     return ResponseEntity.ok(token);
   }
 
   // add refresh token method here route: "/token/refresh"
 }
 
-record AuthRequest(String username, String password) {}
+record AuthRequest(String username, String password) {
+}

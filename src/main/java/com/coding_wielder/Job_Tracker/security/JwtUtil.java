@@ -24,7 +24,7 @@ import jakarta.annotation.PostConstruct;
 
 @Component
 public class JwtUtil {
-  
+
   private static final long EXPIRATION_TIME = 1000 * 60 * 60; // 1 hour
   KeyUtil keyUtil;
 
@@ -35,19 +35,19 @@ public class JwtUtil {
   public String generateToken(UUID id) {
     // add token_use claim for normal and refresh token
     return Jwts.builder()
-      .subject(id.toString())
-      .issuedAt(new Date())
-      .expiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
-      .signWith(keyUtil.getPrivateKey(), keyUtil.getAlg())
-      .compact();
+        .subject(id.toString())
+        .issuedAt(new Date())
+        .expiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
+        .signWith(keyUtil.getPrivateKey(), keyUtil.getAlg())
+        .compact();
   }
 
   public UUID validateTokenAndReturnSubject(String token) throws JwtException {
     Claims jwtClaims = Jwts.parser()
-      .verifyWith(keyUtil.getPublicKey())
-      .build()
-      .parseSignedClaims(token)
-      .getPayload();
+        .verifyWith(keyUtil.getPublicKey())
+        .build()
+        .parseSignedClaims(token)
+        .getPayload();
 
     Date expiration = jwtClaims.getExpiration();
     if (expiration.before(new Date())) {
@@ -80,14 +80,14 @@ class KeyUtil {
     KeyFactory keyFactory = KeyFactory.getInstance(algString);
     return keyFactory.generatePublic(keySpec);
   }
-  
+
   private PrivateKey loadPrivateKey(Path privateKeyPath) throws Exception {
     byte[] decodedKey = keyPathToByteArr(privateKeyPath, "PRIVATE");
     PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(decodedKey);
     KeyFactory keyFactory = KeyFactory.getInstance(algString);
     return keyFactory.generatePrivate(keySpec);
   }
-  
+
   private Path getKeyPath(String publicOrPrivate) {
     Path keyPath = Path.of(keyFilePath);
 
@@ -102,9 +102,9 @@ class KeyUtil {
     byte[] keyBytes = Files.readAllBytes(keyPath);
 
     String keyContent = new String(keyBytes)
-      .replaceAll("-----BEGIN "+ pubblicOrPrivate + " KEY-----", "")
-      .replaceAll("-----END "+ pubblicOrPrivate + " KEY-----", "")
-      .replaceAll("\\s", "");
+        .replaceAll("-----BEGIN " + pubblicOrPrivate + " KEY-----", "")
+        .replaceAll("-----END " + pubblicOrPrivate + " KEY-----", "")
+        .replaceAll("\\s", "");
 
     return Base64.getDecoder().decode(keyContent);
   }

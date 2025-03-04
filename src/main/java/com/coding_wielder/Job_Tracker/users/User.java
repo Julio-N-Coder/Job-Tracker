@@ -7,8 +7,7 @@ import org.springframework.data.relational.core.mapping.Table;
 
 @Table("users")
 public record User(
-  @Id
-  UUID id,
-  String username,
-  String hashedPassword
-) {}
+    @Id UUID id,
+    String username,
+    String hashedPassword) {
+}

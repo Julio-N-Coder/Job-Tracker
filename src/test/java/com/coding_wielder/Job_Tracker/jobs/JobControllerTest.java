@@ -22,9 +22,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.coding_wielder.Job_Tracker.configuration.BaseControllerTestUnit;
 
+// EnableAutoConfiguration excludes db
 @SpringBootTest
 @AutoConfigureMockMvc
-@EnableAutoConfiguration(exclude = {DataSourceAutoConfiguration.class, HibernateJpaAutoConfiguration.class}) // don't need db
+@EnableAutoConfiguration(exclude = { DataSourceAutoConfiguration.class, HibernateJpaAutoConfiguration.class })
 public class JobControllerTest extends BaseControllerTestUnit {
   private final List<Job> jobs = new ArrayList<>();
   private final RequestJob requestJob = new RequestJob("new title", "new company", "Senior Web Devloper");
@@ -46,18 +47,18 @@ public class JobControllerTest extends BaseControllerTestUnit {
     when(jobRepository.findByUserId(userId)).thenReturn(jobs);
 
     mvc.perform(get("/jobs").header("Authorization", "Bearer " + token))
-          .andExpect(status().isOk())
-          .andExpect(jsonPath("$.size()").value(jobs.size()));
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.size()").value(jobs.size()));
   }
-  
+
   @Test
   void shouldReturnJob() throws Exception {
     findByIdAndByUserIdMock();
 
     mvc.perform(get("/job/{id}", jobId).header("Authorization", "Bearer " + token))
-          .andExpect(status().isOk())
-          .andExpect(jsonPath("$.id").value(jobId.toString()))
-          .andExpect(jsonPath("$.jobTitle").value(jobs.get(0).jobTitle()));
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.id").value(jobId.toString()))
+        .andExpect(jsonPath("$.jobTitle").value(jobs.get(0).jobTitle()));
   }
 
   @Test
@@ -65,15 +66,15 @@ public class JobControllerTest extends BaseControllerTestUnit {
     findByIdAndByUserIdMock();
 
     mvc.perform(get("/job/{id}", jobId)
-      .header("Authorization", "Bearer " + token)
-      .contentType(MediaType.APPLICATION_JSON)
-      .content(objectMapper.writeValueAsString(requestJob)))
+        .header("Authorization", "Bearer " + token)
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(objectMapper.writeValueAsString(requestJob)))
         .andExpect(status().isOk());
-    
+
     when(jobRepository.findByIdAndUserId(jobId, userId)).thenReturn(Optional.empty());
     mvc.perform(get("/job/{id}", jobId).header("Authorization", "Bearer " + token)
-      .contentType(MediaType.APPLICATION_JSON)
-      .content(objectMapper.writeValueAsString(requestJob)))
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(objectMapper.writeValueAsString(requestJob)))
         .andExpect(status().isNotFound());
   }
 }

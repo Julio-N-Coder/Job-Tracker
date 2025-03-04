@@ -22,17 +22,16 @@ public class SecurityConfig {
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     http.authorizeHttpRequests((authorize) -> authorize
-    .requestMatchers("/auth/**").permitAll()
-    .anyRequest().authenticated()
-    )
-    .csrf(csrf -> csrf.disable())
-    .addFilterAfter(jwtFilter, AnonymousAuthenticationFilter.class);
+        .requestMatchers("/auth/**").permitAll()
+        .anyRequest().authenticated())
+        .csrf(csrf -> csrf.disable())
+        .addFilterAfter(jwtFilter, AnonymousAuthenticationFilter.class);
 
     return http.build();
   }
 
   @Bean
   public PasswordEncoder passwordEncoder() {
-      return new BCryptPasswordEncoder();
+    return new BCryptPasswordEncoder();
   }
 }

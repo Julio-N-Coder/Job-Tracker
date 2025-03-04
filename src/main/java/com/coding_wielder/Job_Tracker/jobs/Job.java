@@ -8,12 +8,10 @@ import org.springframework.data.relational.core.mapping.Table;
 
 @Table("jobs")
 public record Job(
-  @Id
-  UUID id,
-  String jobTitle,
-  String company,
-  String status,
-  LocalDateTime appliedDate,
-  UUID userId
-) {
+    @Id UUID id,
+    String jobTitle,
+    String company,
+    String status,
+    LocalDateTime appliedDate,
+    UUID userId) {
 }

@@ -14,10 +14,10 @@ public class CustomUserDetails implements UserDetails {
   private final List<? extends GrantedAuthority> authorities;
 
   public CustomUserDetails(UUID id, String username, String password, List<? extends GrantedAuthority> authorities) {
-      this.id = id;
-      this.username = username;
-      this.password = password;
-      this.authorities = authorities;
+    this.id = id;
+    this.username = username;
+    this.password = password;
+    this.authorities = authorities;
   }
 
   public UUID getId() {
@@ -26,16 +26,16 @@ public class CustomUserDetails implements UserDetails {
 
   @Override
   public String getPassword() {
-      return password;
+    return password;
   }
 
   @Override
   public String getUsername() {
-      return username;
+    return username;
   }
 
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
-      return authorities;
+    return authorities;
   }
 }

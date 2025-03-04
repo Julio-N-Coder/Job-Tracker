@@ -22,7 +22,7 @@ public class BaseControllerTestUnit {
 
   @Autowired
   public JwtUtil jwtUtil;
-  
+
   @Autowired
   public ObjectMapper objectMapper;
 

@@ -34,11 +34,9 @@ public class JobController {
     String jobTitle = requestJob.jobTitle();
     String status = requestJob.status();
 
-    if (
-      company == null || jobTitle == null || status == null || 
-      company.length() < 1 || jobTitle.length() < 1 || status.length() < 1 || 
-      company.length() > 255 || jobTitle.length() > 255 || status.length() > 255
-      ) {
+    if (company == null || jobTitle == null || status == null ||
+        company.length() < 1 || jobTitle.length() < 1 || status.length() < 1 ||
+        company.length() > 255 || jobTitle.length() > 255 || status.length() > 255) {
       return false;
     }
 
@@ -60,7 +58,6 @@ public class JobController {
 
     return ResponseEntity.ok(job.get());
   }
-  
 
   @PostMapping("/job")
   public ResponseEntity<Void> addNewJob(@RequestBody RequestJob requestJob) {
@@ -69,12 +66,11 @@ public class JobController {
     }
 
     Job newJob = new Job(null,
-                          requestJob.jobTitle(),
-                          requestJob.company(),
-                          requestJob.status(),
-                          LocalDateTime.now(),
-                          lib.getPrinciple()
-                        );
+        requestJob.jobTitle(),
+        requestJob.company(),
+        requestJob.status(),
+        LocalDateTime.now(),
+        lib.getPrinciple());
     jobRepository.save(newJob);
     return ResponseEntity.ok().build();
   }
@@ -91,13 +87,12 @@ public class JobController {
     }
     Job oldJob = oldJobOptional.get();
     Job newJob = new Job(
-      id, 
-      requestJob.jobTitle(), 
-      requestJob.company(), 
-      requestJob.status(), 
-      oldJob.appliedDate(),
-      lib.getPrinciple()
-    );
+        id,
+        requestJob.jobTitle(),
+        requestJob.company(),
+        requestJob.status(),
+        oldJob.appliedDate(),
+        lib.getPrinciple());
 
     jobRepository.save(newJob);
     return ResponseEntity.ok().build();
@@ -116,7 +111,7 @@ public class JobController {
 }
 
 record RequestJob(
-  String jobTitle,
-  String company,
-  String status
-) {}
+    String jobTitle,
+    String company,
+    String status) {
+}

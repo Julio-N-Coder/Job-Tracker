@@ -7,7 +7,6 @@ import org.springframework.data.jdbc.repository.query.Modifying;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.ListCrudRepository;
 
-
 public interface UserRepository extends ListCrudRepository<User, UUID> {
 
   public Optional<User> findByUsername(String username);
