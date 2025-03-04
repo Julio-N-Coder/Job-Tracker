@@ -57,7 +57,7 @@ export default function ThemeToggle() {
         className="dropdown-content bg-base-300 rounded-box z-1 w-52 p-2 shadow-2xl max-h-64 overflow-y-auto"
       >
         {themes.map((theme) => (
-          <ThemeOption theme={theme} />
+          <ThemeOption key={theme} theme={theme} />
         ))}
       </ul>
     </div>

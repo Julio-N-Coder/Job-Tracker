@@ -36,7 +36,7 @@ public class AuthController {
       return false;
     }
 
-    if (password == null || password.length() < 2) {
+    if (password == null || password.length() < 2 || password.length() > 100) {
       return false;
     }
 
