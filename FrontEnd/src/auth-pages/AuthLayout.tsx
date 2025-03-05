@@ -10,6 +10,14 @@ export default function AuthLayout({ type }: { type: string }) {
     password: "",
   });
   let [isSubmiting, setIsSubmiting] = useState(false);
+  let [hidePopUp, setHidePopUp] = useState(true);
+  let [popUpMessage, setPopUpMessage] = useState("");
+  const statusMessages: { [index: number]: string } = {
+    400: "Bad Request",
+    401: "Unauthorized",
+    403: "Forbidden",
+    500: "Internal Server Error",
+  };
 
   function handleChangeEvent(event: ChangeEvent<HTMLInputElement>) {
     const type = event.currentTarget.id;
@@ -38,6 +46,16 @@ export default function AuthLayout({ type }: { type: string }) {
     return true;
   }
 
+  function showPopUp(message: string) {
+    setPopUpMessage(message);
+    setHidePopUp(false);
+
+    setTimeout(() => {
+      setPopUpMessage("");
+      setHidePopUp(true);
+    }, 5000);
+  }
+
   function toggleSubmitState() {
     setIsSubmiting((prevState) => !prevState);
     document.getElementById("authPageLink")?.classList.toggle("btn-disabled");
@@ -60,23 +78,34 @@ export default function AuthLayout({ type }: { type: string }) {
       });
 
       if (!response.ok) {
-        console.error("Failed. Reason: ", await response.text());
+        let message = await response.text();
+        if (!message || message.length < 1) {
+          message = "Failed. Reason: " + statusMessages[response.status];
+        }
+
+        console.error(message);
         toggleSubmitState();
+        showPopUp(message);
         return;
       }
 
       localStorage.token = await response.text();
-      console.log(localStorage.token);
 
       navigation("/jobs-page");
     } catch (e: any) {
       console.log("Error: ", e.message);
       toggleSubmitState();
+      showPopUp("Failed, Reason: " + e.message);
     }
   }
 
   return (
     <div className="flex flex-grow flex-col gap-8 justify-center items-center relative">
+      <ErrorPopup
+        className="max-w-128 absolute top-0"
+        message={popUpMessage}
+        hidden={hidePopUp}
+      />
       <div className="bg-base-200 p-4 rounded-2xl flex flex-col items-center gap-4">
         <form onSubmit={handleSubmit} className="flex flex-col items-center">
           <fieldset>
@@ -149,6 +178,38 @@ export default function AuthLayout({ type }: { type: string }) {
           </NavLink>
         </div>
       </div>
+    </div>
+  );
+}
+
+function ErrorPopup({
+  message,
+  className,
+  hidden,
+}: {
+  message: string;
+  className?: string;
+  hidden?: boolean;
+}) {
+  return (
+    <div
+      role="alert"
+      className={`alert alert-error ${className} ${hidden ? "hidden" : ""}`}
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        className="h-6 w-6 shrink-0 stroke-current"
+        fill="none"
+        viewBox="0 0 24 24"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth="2"
+          d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+        />
+      </svg>
+      <span className="text-lg font-bold">{message}</span>
     </div>
   );
 }
