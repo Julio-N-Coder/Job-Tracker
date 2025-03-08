@@ -9,4 +9,14 @@ services:
     ports:
       - "5432:5432"
 
+  pgadmin4:
+    container_name: pgadmin4-web
+    image: "dpage/pgadmin4:latest"
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=dev@example.com
+      - PGADMIN_DEFAULT_PASSWORD=secret
+      - PGADMIN_LISTEN_PORT=5050
+    ports:
+      - 5050:5050
+
   # Add nginx service container
