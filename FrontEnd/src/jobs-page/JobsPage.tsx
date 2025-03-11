@@ -14,26 +14,38 @@ export default function JobsPage() {
     }
 
     async function fetchJobs() {
-      const response = await fetch(`${BACKEND_URL}/jobs`, {
-        headers: {
-          Authorization: "Bearer " + localStorage.token
+      try {
+        const response = await fetch(`${BACKEND_URL}/api/jobs`, {
+          headers: {
+            Authorization: "Bearer " + localStorage.token,
+          },
+        });
+
+        if (!response.ok) {
+          navigate("/login");
         }
-      })
 
-      if (!response.ok) {
-        navigate("/login");
+        jobs = await response.json();
+        console.log("jobs: ", jobs);
+      } catch (error: any) {
+        console.error("Error: ", error.message);
       }
-
-      jobs = await response.json();
     }
     fetchJobs();
-  }, [])
+  }, []);
 
   return (
     <div className="container mx-auto bg-base-200">
       {/* display jobs card data */}
       {jobs.map(() => (
-        <Card jobId="id" jobTitle="jobTitle" company="company" status="status" appliedDate={new Date()} userId="userId"/>
+        <Card
+          jobId="id"
+          jobTitle="jobTitle"
+          company="company"
+          status="status"
+          appliedDate={new Date()}
+          userId="userId"
+        />
       ))}
     </div>
   );
