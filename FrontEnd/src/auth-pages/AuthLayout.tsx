@@ -2,6 +2,11 @@ import { NavLink } from "react-router";
 import { useNavigate } from "react-router";
 import { FormEvent, ChangeEvent, useState } from "react";
 
+interface TokenResponse {
+  token: string;
+  refresh_token: string;
+}
+
 export default function AuthLayout({ type }: { type: string }) {
   let navigation = useNavigate();
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
@@ -89,11 +94,12 @@ export default function AuthLayout({ type }: { type: string }) {
         return;
       }
 
-      localStorage.token = await response.text();
+      const tokenResponse: TokenResponse = await response.json();
+      localStorage.token = tokenResponse.token;
+      localStorage.refresh_token = tokenResponse.refresh_token;
 
       navigation("/jobs-page");
     } catch (e: any) {
-      console.log("Error: ", e.message);
       toggleSubmitState();
       showPopUp("Failed, Reason: " + e.message);
     }

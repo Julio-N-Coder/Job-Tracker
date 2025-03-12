@@ -12,4 +12,8 @@ public class Lib {
   public UUID getPrinciple() {
     return ((CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId();
   }
+
+  public String getToken() {
+    return ((CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getToken();
+  }
 }

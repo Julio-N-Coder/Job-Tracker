@@ -7,6 +7,7 @@ export default function Navbar() {
 
   function signOut() {
     localStorage.removeItem("token");
+    localStorage.removeItem("refresh_token");
 
     navigation("/");
   }

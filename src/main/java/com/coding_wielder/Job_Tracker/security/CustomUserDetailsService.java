@@ -1,6 +1,7 @@
 package com.coding_wielder.Job_Tracker.security;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -27,10 +28,20 @@ public class CustomUserDetailsService implements UserDetailsService {
         .orElseThrow(() -> new UsernameNotFoundException("User not found"));
   }
 
-  public CustomUserDetails loadUserById(UUID userId) {
-    return userRepository.findById(userId)
-        .map(this::mapToUserDetails)
-        .orElseThrow(() -> new UsernameNotFoundException("User not found with ID: " + userId));
+  public CustomUserDetails loadUserById(UUID userId, String token) {
+
+    Optional<User> optionalUser = userRepository.findById(userId);
+    if (optionalUser.isEmpty()) {
+      throw new UsernameNotFoundException("User not found with ID: " + userId);
+    }
+    User user = optionalUser.get();
+
+    return new CustomUserDetails(
+        user.id(),
+        user.username(),
+        user.hashedPassword(),
+        token,
+        List.of(new SimpleGrantedAuthority("USER")));
   }
 
   private CustomUserDetails mapToUserDetails(User user) {
@@ -38,7 +49,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         user.id(),
         user.username(),
         user.hashedPassword(),
+        null, // not implemented on loadbyusername
         List.of(new SimpleGrantedAuthority("USER")));
   }
-
 }

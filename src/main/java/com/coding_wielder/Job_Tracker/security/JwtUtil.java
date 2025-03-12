@@ -26,6 +26,7 @@ import jakarta.annotation.PostConstruct;
 public class JwtUtil {
 
   private static final long EXPIRATION_TIME = 1000 * 60 * 60; // 1 hour
+  private static final long ONE_YEAR_IN_MILLISECONDS = 365L * 24 * 60 * 60 * 1000; // 1 year
   KeyUtil keyUtil;
 
   JwtUtil(KeyUtil keyUtil) {
@@ -33,21 +34,35 @@ public class JwtUtil {
   }
 
   public String generateToken(UUID id) {
-    // add token_use claim for normal and refresh token
     return Jwts.builder()
         .subject(id.toString())
         .issuedAt(new Date())
+        .claim("token_use", "token")
         .expiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
         .signWith(keyUtil.getPrivateKey(), keyUtil.getAlg())
         .compact();
   }
 
-  public UUID validateTokenAndReturnSubject(String token) throws JwtException {
-    Claims jwtClaims = Jwts.parser()
+  public String generateRefreshToken(UUID id) {
+    return Jwts.builder()
+        .subject(id.toString())
+        .issuedAt(new Date())
+        .claim("token_use", "refresh_token")
+        .expiration(new Date(System.currentTimeMillis() + ONE_YEAR_IN_MILLISECONDS))
+        .signWith(keyUtil.getPrivateKey(), keyUtil.getAlg())
+        .compact();
+  }
+
+  public Claims validateTokenAndReturnClaims(String token) throws JwtException {
+    return Jwts.parser()
         .verifyWith(keyUtil.getPublicKey())
         .build()
         .parseSignedClaims(token)
         .getPayload();
+  }
+
+  public UUID validateTokenAndReturnSubject(String token) throws JwtException {
+    Claims jwtClaims = validateTokenAndReturnClaims(token);
 
     Date expiration = jwtClaims.getExpiration();
     if (expiration.before(new Date())) {
@@ -55,6 +70,17 @@ public class JwtUtil {
     }
 
     return UUID.fromString(jwtClaims.getSubject());
+  }
+
+  public String refresh(String refreshToken) throws JwtException {
+    Claims jwtClaims = validateTokenAndReturnClaims(refreshToken);
+
+    String token_use = jwtClaims.get("token_use", String.class);
+    if (!token_use.equals("refresh_token")) {
+      throw new JwtException("Invalid Token Type");
+    }
+
+    return generateToken(UUID.fromString(jwtClaims.getSubject()));
   }
 }
 
