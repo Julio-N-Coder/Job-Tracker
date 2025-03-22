@@ -1,11 +1,12 @@
-import { FormEvent, useEffect, useState } from "react";
+import { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import Card from "../components/card/Card";
 import { useNavigate } from "react-router";
 import { Job } from "../types";
 import areTokensValid from "../lib/tokens";
 
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+
 export default function JobsPage() {
-  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
   let navigate = useNavigate();
   let [jobs, setJobs] = useState<Job[]>([]);
 
@@ -26,8 +27,14 @@ export default function JobsPage() {
           navigate("/login");
         }
 
-        setJobs(await response.json());
-        console.log("jobs: ", jobs);
+        let newJobs = ((await response.json()) as Job[]).map((job) => {
+          return {
+            ...job,
+            appliedDate: new Date(job.appliedDate),
+          };
+        });
+
+        setJobs(newJobs);
       } catch (error: any) {
         console.error("Error: ", error.message);
       }
@@ -52,8 +59,9 @@ export default function JobsPage() {
       </div>
       <div className="p-2 flex justify-around flex-wrap gap-2">
         {/* display jobs card data */}
-        {jobs.map((job) => (
+        {jobs.map((job, index) => (
           <Card
+            key={job.jobId || index}
             jobId={job.jobId}
             jobTitle={job.jobTitle}
             company={job.company}
@@ -69,9 +77,47 @@ export default function JobsPage() {
 }
 
 function AddJobModel() {
-  function handleJobSubmit(event: FormEvent<HTMLFormElement>) {
+  const [jobData, setJobData] = useState({
+    "job-title-input": "",
+    "company-input": "",
+  });
+
+  async function handleJobSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    console.log("send post request here");
+
+    // add a way to display error
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/job`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + localStorage.token,
+        },
+        body: JSON.stringify({
+          jobTitle: jobData["job-title-input"],
+          company: jobData["company-input"],
+          status: "Not Responded",
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to add job");
+      }
+
+      console.log("Job added successfully");
+    } catch (error: any) {
+      console.error("Error: ", error.message);
+    }
+  }
+
+  function handleChange(event: ChangeEvent<HTMLInputElement>) {
+    const type = event.currentTarget.id;
+    const value = event.currentTarget.value;
+
+    setJobData({
+      ...jobData,
+      [type]: value,
+    });
   }
 
   return (
@@ -82,16 +128,41 @@ function AddJobModel() {
             ✕
           </button>
         </form>
-        <h3 className="font-bold text-lg">Hello!</h3>
-        <p className="">Press ESC key or click the button below to close</p>
-        <p className="">Model not setup. add form to add a job</p>
+        <h3 className="font-bold text-lg">Add a Job</h3>
         <form
+          className="space-y-4 flex flex-col"
           id="add-job-form"
           onSubmit={(event) => {
             handleJobSubmit(event);
           }}
         >
-          <button className="btn btn-accent">Submit</button>
+          <div>
+            <label htmlFor="job-title-input">
+              <p>Job Title</p>
+            </label>
+            <input
+              id="job-title-input"
+              className="input"
+              minLength={1}
+              maxLength={255}
+              required
+              onChange={handleChange}
+            />
+          </div>
+          <div>
+            <label htmlFor="company-input">
+              <p>Company</p>
+            </label>
+            <input
+              id="company-input"
+              className="input"
+              minLength={1}
+              maxLength={255}
+              required
+              onChange={handleChange}
+            />
+          </div>
+          <button className="btn btn-accent w-32">Submit</button>
         </form>
       </div>
     </dialog>

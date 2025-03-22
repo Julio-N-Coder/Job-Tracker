@@ -13,7 +13,6 @@ export default async function areTokensValid() {
     localStorage.removeItem("refresh_token");
     return false;
   }
-  console.log("is running?");
 
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
   const refresh_token: string = localStorage.refresh_token;
