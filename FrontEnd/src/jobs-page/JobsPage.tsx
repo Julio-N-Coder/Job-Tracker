@@ -3,6 +3,8 @@ import Card from "../components/card/Card";
 import { useNavigate } from "react-router";
 import { Job } from "../types";
 import areTokensValid from "../lib/tokens";
+import ErrorPopup from "../components/ErrorPopup";
+import SubmitButton from "../components/SubmitButton";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
@@ -77,15 +79,39 @@ export default function JobsPage() {
 }
 
 function AddJobModel() {
+  let navigate = useNavigate();
   const [jobData, setJobData] = useState({
     "job-title-input": "",
     "company-input": "",
   });
+  let [hidePopUp, setHidePopUp] = useState(true);
+  let [popUpMessage, setPopUpMessage] = useState("");
+  let [isSubmiting, setIsSubmiting] = useState(false);
+  const statusMessages: { [index: number]: string } = {
+    400: "Bad Request",
+    401: "Unauthorized",
+    403: "Forbidden",
+    500: "Internal Server Error",
+  };
+
+  function showPopUp(message: string) {
+    setPopUpMessage(message);
+    setHidePopUp(false);
+
+    setTimeout(() => {
+      setPopUpMessage("");
+      setHidePopUp(true);
+    }, 5000);
+  }
+
+  function toggleSubmitState() {
+    setIsSubmiting((prevState) => !prevState);
+  }
 
   async function handleJobSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    toggleSubmitState();
 
-    // add a way to display error
     try {
       const response = await fetch(`${BACKEND_URL}/api/job`, {
         method: "POST",
@@ -101,11 +127,22 @@ function AddJobModel() {
       });
 
       if (!response.ok) {
-        throw new Error("Failed to add job");
+        let message = await response.text();
+        if (!message || message.length < 1) {
+          message = "Failed. Reason: " + statusMessages[response.status];
+        }
+
+        showPopUp(message);
+        toggleSubmitState();
+        console.error(message);
+        return;
       }
 
-      console.log("Job added successfully");
+      toggleSubmitState();
+      navigate(0);
     } catch (error: any) {
+      showPopUp("Error: " + error.message);
+      toggleSubmitState();
       console.error("Error: ", error.message);
     }
   }
@@ -122,6 +159,11 @@ function AddJobModel() {
 
   return (
     <dialog id="add-job-id" className="modal modal-bottom sm:modal-middle">
+      <ErrorPopup
+        className="absolute top-1/4 sm:top-1/9"
+        hidden={hidePopUp}
+        message={popUpMessage}
+      />
       <div className="modal-box">
         <form method="dialog">
           <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
@@ -162,7 +204,7 @@ function AddJobModel() {
               onChange={handleChange}
             />
           </div>
-          <button className="btn btn-accent w-32">Submit</button>
+          <SubmitButton isSubmiting={isSubmiting} />
         </form>
       </div>
     </dialog>
