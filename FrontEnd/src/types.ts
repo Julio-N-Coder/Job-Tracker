@@ -1,8 +1,11 @@
-interface Job {
-  jobId: string;
+interface JobBasicData {
   jobTitle: string;
   company: string;
   status: string;
+}
+
+interface Job extends JobBasicData {
+  id: string;
   appliedDate: Date;
   userId: string;
 }
@@ -14,4 +17,4 @@ interface Token {
   iat: number;
 }
 
-export type { Job, Token };
+export type { JobBasicData, Job, Token };
