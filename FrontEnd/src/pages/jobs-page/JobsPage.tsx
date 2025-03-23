@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import Card from "../components/card/Card";
+import Card from "../../components/card/Card";
 import { useNavigate } from "react-router";
-import { Job } from "../types";
-import areTokensValid from "../lib/tokens";
-import JobModel from "../components/jobs/JobModel";
+import { Job } from "../../types";
+import areTokensValid from "../../lib/tokens";
+import JobModel from "../../components/jobs/JobModel";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
@@ -11,6 +11,7 @@ export default function JobsPage() {
   let navigate = useNavigate();
   let [jobs, setJobs] = useState<Job[]>([]);
   const addJobId = "add-job-id";
+  const updateJobId = "update-job-id";
 
   useEffect(() => {
     async function fetchJobs() {
@@ -68,10 +69,12 @@ export default function JobsPage() {
             status={job.status}
             appliedDate={job.appliedDate}
             userId={job.userId}
+            modelId={updateJobId}
           />
         ))}
       </div>
       <JobModel action="Add" id={addJobId} />
+      <JobModel action="Update" id={updateJobId} />
     </div>
   );
 }

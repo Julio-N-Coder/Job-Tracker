@@ -3,10 +3,10 @@ import { BrowserRouter, Routes, Route } from "react-router";
 import "./index.css";
 import Index from "./index.tsx";
 import Container from "./container.tsx";
-import JobsPage from "./jobs-page/JobsPage.tsx";
+import JobsPage from "./pages/jobs-page/JobsPage.tsx";
 import About from "./about/about.tsx";
-import LoginPage from "./auth-pages/LoginPage.tsx";
-import SignUpPage from "./auth-pages/SignUpPage.tsx";
+import LoginPage from "./pages/auth-pages/LoginPage.tsx";
+import SignUpPage from "./pages/auth-pages/SignUpPage.tsx";
 
 const root = document.getElementById("root") as ReactDOM.Container;
 

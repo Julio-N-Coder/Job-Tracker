@@ -1,8 +1,8 @@
 import { NavLink } from "react-router";
 import { useNavigate } from "react-router";
 import { FormEvent, ChangeEvent, useState } from "react";
-import ErrorPopup from "../components/ErrorPopup";
-import SubmitButton from "../components/SubmitButton";
+import ErrorPopup from "../../components/ErrorPopup";
+import SubmitButton from "../../components/SubmitButton";
 
 interface TokenResponse {
   token: string;

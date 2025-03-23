@@ -101,7 +101,7 @@ public class JobController {
   @DeleteMapping("/job/{id}")
   public ResponseEntity<Void> deleteJob(@PathVariable UUID id) {
     int rowsAffected = jobRepository.deleteByIdAndUserId(id, lib.getPrinciple());
-    System.out.println("Rows Affected: " + rowsAffected);
+
     if (rowsAffected < 1) {
       return ResponseEntity.badRequest().build();
     }
