@@ -1,7 +1,7 @@
 import { ChangeEvent, FormEvent, useState, useRef } from "react";
 import { useNavigate } from "react-router";
-import ErrorPopup from "../ErrorPopup";
 import SubmitButton from "../SubmitButton";
+import FormModel from "../baseModels/FormModel";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
@@ -140,75 +140,64 @@ export default function JobModel({
   }
 
   return (
-    <dialog
-      ref={dialogRef}
+    <FormModel
       id={id}
-      className="modal modal-bottom sm:modal-middle"
+      dialogRef={dialogRef}
+      hidePopUp={hidePopUp}
+      popUpMessage={popUpMessage}
     >
-      <ErrorPopup
-        className="absolute top-1/4 sm:top-1/9"
-        hidden={hidePopUp}
-        message={popUpMessage}
-      />
-      <div className="modal-box">
-        <form method="dialog">
-          <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
-            ✕
-          </button>
-        </form>
-        <h3 className="font-bold text-lg">{action} a Job</h3>
-        <form
-          className="space-y-4 flex flex-col"
-          id="add-job-form"
-          onSubmit={(event) => {
-            handleJobSubmit(event);
-          }}
-        >
-          <div>
-            <label htmlFor={jobInputId}>
-              <p>Job Title</p>
-            </label>
-            <input
-              id={jobInputId}
-              className="input"
-              minLength={action === "Add" ? 1 : 0}
-              maxLength={255}
-              required={action === "Add"}
-              onChange={handleChange}
-            />
-          </div>
-          <div>
-            <label htmlFor={companyInputId}>
-              <p>Company</p>
-            </label>
-            <input
-              id={companyInputId}
-              className="input"
-              minLength={action === "Add" ? 1 : 0}
-              maxLength={255}
-              required={action === "Add"}
-              onChange={handleChange}
-            />
-          </div>
-          {action === "Update" && (
-            <div>
-              <label htmlFor={statusInputId}>
-                <p>Status</p>
-              </label>
-              <input
-                id={statusInputId}
-                className="input"
-                maxLength={255}
-                onChange={handleChange}
-              />
-            </div>
-          )}
-          <SubmitButton
-            isSubmiting={isSubmiting}
-            id={`${action}-submit-button`}
+      <h3 className="font-bold text-lg">{action} a Job</h3>
+      <form
+        className="space-y-4 flex flex-col"
+        id="add-job-form"
+        onSubmit={(event) => {
+          handleJobSubmit(event);
+        }}
+      >
+        <div>
+          <label htmlFor={jobInputId}>
+            <p>Job Title</p>
+          </label>
+          <input
+            id={jobInputId}
+            className="input"
+            minLength={action === "Add" ? 1 : 0}
+            maxLength={255}
+            required={action === "Add"}
+            onChange={handleChange}
           />
-        </form>
-      </div>
-    </dialog>
+        </div>
+        <div>
+          <label htmlFor={companyInputId}>
+            <p>Company</p>
+          </label>
+          <input
+            id={companyInputId}
+            className="input"
+            minLength={action === "Add" ? 1 : 0}
+            maxLength={255}
+            required={action === "Add"}
+            onChange={handleChange}
+          />
+        </div>
+        {action === "Update" && (
+          <div>
+            <label htmlFor={statusInputId}>
+              <p>Status</p>
+            </label>
+            <input
+              id={statusInputId}
+              className="input"
+              maxLength={255}
+              onChange={handleChange}
+            />
+          </div>
+        )}
+        <SubmitButton
+          isSubmiting={isSubmiting}
+          id={`${action}-submit-button`}
+        />
+      </form>
+    </FormModel>
   );
 }

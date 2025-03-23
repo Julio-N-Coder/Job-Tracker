@@ -7,3 +7,11 @@
 .nav-buttons {
   @apply ring-0 text-3xl btn btn-soft
 }
+
+.responsive-model {
+  @apply modal modal-bottom sm:modal-middle
+}
+
+.model-exit-button {
+  @apply btn btn-sm btn-circle btn-ghost absolute right-2 top-2
+}
