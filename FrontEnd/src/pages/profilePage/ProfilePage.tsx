@@ -12,10 +12,65 @@ export default function ProfilePage() {
   //   let [userId, setUserId] = useState("");
   let [hidePopUp, setHidePopUp] = useState(true);
   let [popUpMessage, setPopUpMessage] = useState("");
+  let [isWaitingForAccountDelete, setIsWaitingForAccountDelete] =
+    useState(false);
   const modelId = "delete-acccount-model-id";
+  const statusMessages: { [index: number]: string } = {
+    400: "Bad Request",
+    401: "Unauthorized",
+    403: "Forbidden",
+    500: "Internal Server Error",
+  };
 
-  function deleteAccount() {
-    console.log("Delete account here");
+  function signOut() {
+    localStorage.removeItem("token");
+    localStorage.removeItem("refresh_token");
+
+    navigate("/");
+  }
+
+  function showPopUp(message: string) {
+    setPopUpMessage(message);
+    setHidePopUp(false);
+
+    setTimeout(() => {
+      setPopUpMessage("");
+      setHidePopUp(true);
+    }, 5000);
+  }
+
+  function showModelError(message: string) {
+    console.error(message);
+    showPopUp(message);
+    setIsWaitingForAccountDelete((prev) => !prev);
+  }
+
+  async function deleteAccount() {
+    setIsWaitingForAccountDelete((prev) => !prev);
+
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/user`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+
+      if (!response.ok) {
+        let message = await response.text();
+        if (!message || message.length < 1) {
+          message = "Failed. Reason: " + statusMessages[response.status];
+        }
+
+        showModelError(message);
+        return;
+      }
+
+      signOut();
+    } catch (error: any) {
+      showModelError("Error: " + error.message);
+    }
   }
 
   // fetch user info and dislay it
@@ -67,6 +122,7 @@ export default function ProfilePage() {
           <button
             className="btn btn-error text-lg w-42"
             onClick={deleteAccount}
+            disabled={isWaitingForAccountDelete}
           >
             Delete Account
           </button>

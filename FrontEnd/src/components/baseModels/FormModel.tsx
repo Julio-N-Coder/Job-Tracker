@@ -24,7 +24,7 @@ export default function FormModel({
       className="responsive-model"
     >
       <ErrorPopup
-        className="absolute top-1/4 sm:top-1/9"
+        className="absolute left-3/7 left sm:left-auto top-1/4 sm:top-1/9"
         hidden={hidePopUp}
         message={popUpMessage}
       />
