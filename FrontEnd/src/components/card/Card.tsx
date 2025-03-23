@@ -1,5 +1,8 @@
+import { useNavigate } from "react-router";
 import { Job, JobBasicData } from "../../types";
 import JobModel from "../jobs/JobModel";
+
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 export default function Card({
   id,
@@ -9,7 +12,14 @@ export default function Card({
   appliedDate,
   userId,
 }: Job) {
+  let navigation = useNavigate();
   const updateJobId = "update-job-id";
+  const statusMessages: { [index: number]: string } = {
+    400: "Bad Request",
+    401: "Unauthorized",
+    403: "Forbidden",
+    500: "Internal Server Error",
+  };
 
   function passData(): JobBasicData {
     return {
@@ -17,6 +27,32 @@ export default function Card({
       company: company,
       status: status,
     };
+  }
+
+  async function deleteJob() {
+    console.log("setup delete", id);
+
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/job/${id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: "Bearer " + localStorage.token,
+        },
+      });
+
+      if (!response.ok) {
+        let message = await response.text();
+        if (!message || message.length < 1) {
+          message = "Failed. Reason: " + statusMessages[response.status];
+        }
+
+        console.error(message);
+      }
+
+      navigation(0);
+    } catch (error: any) {
+      console.error("Error: ", error.message);
+    }
   }
 
   return (
@@ -41,7 +77,9 @@ export default function Card({
         >
           Update
         </button>
-        <button className="btn btn-accent">Delete</button>
+        <button className="btn btn-accent" onClick={deleteJob}>
+          Delete
+        </button>
       </div>
       <JobModel
         action="Update"
