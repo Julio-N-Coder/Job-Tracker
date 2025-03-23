@@ -1,6 +1,7 @@
 import { NavLink } from "react-router";
 import ThemeToggle from "./ThemeToggle";
 import { useNavigate } from "react-router";
+import { UserSvg } from "../svg/Svg";
 
 export default function Navbar() {
   let navigation = useNavigate();
@@ -40,7 +41,7 @@ export default function Navbar() {
           Job Tracker
         </NavLink>
       </div>
-      <div className="space-x-4">
+      <div className="flex items-center gap-2">
         <ThemeToggle />
         {!localStorage.token ? (
           <NavLink
@@ -50,14 +51,30 @@ export default function Navbar() {
             Login
           </NavLink>
         ) : (
-          <button
-            onClick={signOut}
-            className="btn btn-accent text-xl text-accent-content"
-          >
-            SignOut
-          </button>
+          <UserIcon signOut={signOut} />
         )}
       </div>
     </nav>
+  );
+}
+
+function UserIcon({ signOut }: { signOut: () => void }) {
+  return (
+    <div className="dropdown dropdown-end">
+      <div tabIndex={0} role="button" className="bg-base-100 p-3 rounded-full">
+        <UserSvg className="h-6 opacity-80" />
+      </div>
+      <ul
+        tabIndex={0}
+        className="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm font-bold"
+      >
+        <li>
+          <button onClick={signOut}>Sign Out</button>
+        </li>
+        <li>
+          <NavLink to="/profile-page">Profile</NavLink>
+        </li>
+      </ul>
+    </div>
   );
 }

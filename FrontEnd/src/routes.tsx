@@ -7,6 +7,7 @@ import JobsPage from "./pages/jobs-page/JobsPage.tsx";
 import About from "./about/about.tsx";
 import LoginPage from "./pages/auth-pages/LoginPage.tsx";
 import SignUpPage from "./pages/auth-pages/SignUpPage.tsx";
+import ProfilePage from "./pages/profilePage/ProfilePage.tsx";
 
 const root = document.getElementById("root") as ReactDOM.Container;
 
@@ -17,7 +18,9 @@ ReactDOM.createRoot(root).render(
         <Route index element={<Index />} />
         <Route path="jobs-page" element={<JobsPage />} />
         <Route path="about" element={<About />} />
+        <Route path="profile-page" element={<ProfilePage />} />
       </Route>
+      {/* I made a seperate root route below so I can center input divs with a navbar */}
       <Route
         path="/"
         element={<Container className="min-h-screen flex flex-col" />}
