@@ -1,6 +1,5 @@
-import { ChangeEvent, FormEvent, useState } from "react";
+import { ChangeEvent, FormEvent, useState, useRef } from "react";
 import { useNavigate } from "react-router";
-import { JobBasicData } from "../../types";
 import ErrorPopup from "../ErrorPopup";
 import SubmitButton from "../SubmitButton";
 
@@ -9,15 +8,12 @@ const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 export default function JobModel({
   action,
   id,
-  jobId,
-  prevJobData,
 }: {
   action: "Add" | "Update";
   id: string;
-  jobId?: string;
-  prevJobData?: JobBasicData;
 }) {
   let navigate = useNavigate();
+  let dialogRef = useRef<HTMLDialogElement>(null);
   const jobInputId = `${action}-job-title-input`;
   const companyInputId = `${action}-company-input`;
   const statusInputId = "status-input";
@@ -65,27 +61,29 @@ export default function JobModel({
       return;
     }
 
+    // job id is added to dialog element when update button is pressed
+    // undefined if add job button is pressed
+    let jobId = dialogRef.current?.dataset.jobId;
+
     let url = `${BACKEND_URL}/api/job${jobId ? "/" + jobId : ""}`;
     let method = "POST";
     let body = "";
 
-    if (action === "Update") {
-      console.log("prev status", jobData.status);
+    if (action === "Update" && jobId != null) {
       method = "PUT";
 
+      // grab job data from it's card
+      const jobCard = document.getElementById(jobId) as HTMLDivElement;
+      let prevJobTitle = jobCard.childNodes[0].textContent;
+      let prevCompany = jobCard.childNodes[1].textContent?.split(": ")[1];
+      let prevStatus = jobCard.childNodes[2].textContent?.split(": ")[1];
+
       // if left empty, set to previous value
-      let jobTitle = jobData[jobInputId]
-        ? jobData[jobInputId]
-        : prevJobData?.jobTitle;
+      let jobTitle = jobData[jobInputId] ? jobData[jobInputId] : prevJobTitle;
       let company = jobData[companyInputId]
         ? jobData[companyInputId]
-        : prevJobData?.company;
-      let status = jobData[statusInputId]
-        ? jobData[statusInputId]
-        : prevJobData?.status;
-      console.log(jobTitle);
-      console.log(company);
-      console.log(status);
+        : prevCompany;
+      let status = jobData[statusInputId] ? jobData[statusInputId] : prevStatus;
 
       body = JSON.stringify({
         jobTitle,
@@ -142,7 +140,11 @@ export default function JobModel({
   }
 
   return (
-    <dialog id={id} className="modal modal-bottom sm:modal-middle">
+    <dialog
+      ref={dialogRef}
+      id={id}
+      className="modal modal-bottom sm:modal-middle"
+    >
       <ErrorPopup
         className="absolute top-1/4 sm:top-1/9"
         hidden={hidePopUp}
