@@ -61,7 +61,11 @@ export default function Navbar() {
 function UserIcon({ signOut }: { signOut: () => void }) {
   return (
     <div className="dropdown dropdown-end">
-      <div tabIndex={0} role="button" className="bg-base-100 p-3 rounded-full">
+      <div
+        tabIndex={0}
+        role="button"
+        className="bg-base-100 p-3 rounded-full hover:bg-base-200"
+      >
         <UserSvg className="h-6 opacity-80" />
       </div>
       <ul

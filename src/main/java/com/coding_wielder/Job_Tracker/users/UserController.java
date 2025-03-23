@@ -1,6 +1,7 @@
 package com.coding_wielder.Job_Tracker.users;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -23,14 +24,14 @@ public class UserController {
   }
 
   @GetMapping("")
-  public ResponseEntity<User> getUser() {
+  public ResponseEntity<ResponseUser> getUser() {
     Optional<User> userOptional = userRepository.findById(lib.getPrinciple());
     if (userOptional.isEmpty()) {
       return ResponseEntity.notFound().build();
     }
 
     User user = userOptional.get();
-    return ResponseEntity.ok(user);
+    return ResponseEntity.ok(new ResponseUser(user.id(), user.username()));
   }
 
   @DeleteMapping("")
@@ -49,4 +50,7 @@ public class UserController {
 record RequestUser(
     String username,
     String password) {
+}
+
+record ResponseUser(UUID id, String username) {
 }

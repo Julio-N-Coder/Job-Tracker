@@ -10,6 +10,11 @@ interface Job extends JobBasicData {
   userId: string;
 }
 
+interface User {
+  id: string;
+  username: string;
+}
+
 interface Token {
   sub: string;
   token_use: "token" | "refresh_token";
@@ -17,4 +22,4 @@ interface Token {
   iat: number;
 }
 
-export type { JobBasicData, Job, Token };
+export type { JobBasicData, Job, Token, User };
