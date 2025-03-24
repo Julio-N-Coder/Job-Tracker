@@ -6,10 +6,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import io.jsonwebtoken.JwtException;
+
 import java.util.Base64;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest(classes = { KeyUtil.class, JwtUtil.class, ObjectMapper.class })
 public class JwtUtilTest {
@@ -31,22 +34,30 @@ public class JwtUtilTest {
     void generateTokenTest() {
         String token = jwtUtil.generateToken(userId);
 
-        String[] splitToken = token.split("\\.");
-        String stringHeader = splitToken[0];
-        String stringBody = splitToken[1];
-
-        Header header = base64Decode(stringHeader, Header.class);
-        assertEquals(header.alg(), "EdDSA", "Header alg is not EdDSA");
-
-        Body body = base64Decode(stringBody, Body.class);
-        assertEquals(body.sub(), userId, "Does not Equal userId");
-        assertEquals(body.token_use(), "token", "Is not a normal token");
+        testToken(token, "token");
     }
 
     @Test
     void generateRefreshTokenTest() {
         String token = jwtUtil.generateRefreshToken(userId);
 
+        testToken(token, "refresh_token");
+    }
+
+    @Test
+    void refreshTest() {
+        String refresh_token = jwtUtil.generateRefreshToken(userId);
+        String token = jwtUtil.refresh(refresh_token);
+
+        testToken(token, "token");
+
+        // only refresh tokens can refresh tokens
+        assertThrows(JwtException.class, () -> {
+            jwtUtil.refresh(token);
+        });
+    }
+
+    private void testToken(String token, String token_type) {
         String[] splitToken = token.split("\\.");
         String stringHeader = splitToken[0];
         String stringBody = splitToken[1];
@@ -56,7 +67,11 @@ public class JwtUtilTest {
 
         Body body = base64Decode(stringBody, Body.class);
         assertEquals(body.sub(), userId, "Does not Equal userId");
-        assertEquals(body.token_use(), "refresh_token", "Not a refresh token");
+        if (token_type == "refresh_token") {
+            assertEquals(body.token_use(), "refresh_token", "Not a refresh token");
+        } else {
+            assertEquals(body.token_use(), "token", "Is not a normal token");
+        }
     }
 
     private <T> T base64Decode(String base64String, Class<T> clazz) {
