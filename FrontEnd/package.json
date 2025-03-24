@@ -6,6 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "build-local": "tsc -b && VITE_BACKEND_URL=http://localhost:8080 vite build",
+    "build-for-container": "tsc -b && VITE_BACKEND_URL=http://host.docker.internal:8080 vite build",
     "lint": "eslint .",
     "preview": "vite preview"
   },

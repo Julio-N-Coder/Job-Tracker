@@ -18,5 +18,3 @@ services:
       - PGADMIN_LISTEN_PORT=5050
     ports:
       - 5050:5050
-
-  # Add nginx service container
