@@ -36,6 +36,8 @@ public class AuthControllerTest extends BaseControllerTestUnit {
   private final User user = new User(userId, username, password);
   private final AuthRequest userData = new AuthRequest(username, password);
   private final String token = "fakeToken";
+  private final String refresh_token = "fakeRefreshToken";
+  private final String tokenStringObject = "{\"token\":\"" + token + "\",\"refresh_token\":\"" + refresh_token + "\"}";
 
   @MockitoBean
   public JwtUtil jwtUtil;
@@ -47,6 +49,7 @@ public class AuthControllerTest extends BaseControllerTestUnit {
   @BeforeEach
   private void beforeEach() {
     when(jwtUtil.generateToken(any(UUID.class))).thenReturn(token);
+    when(jwtUtil.generateRefreshToken(any(UUID.class))).thenReturn(refresh_token);
   }
 
   private MockHttpServletRequestBuilder postMethod(String path) throws Exception {
@@ -65,7 +68,7 @@ public class AuthControllerTest extends BaseControllerTestUnit {
         .andExpect(status().isOk())
         .andReturn().getResponse().getContentAsString();
 
-    assertEquals(responseBody, token);
+    assertEquals(responseBody, tokenStringObject);
   }
 
   @Test
@@ -82,6 +85,6 @@ public class AuthControllerTest extends BaseControllerTestUnit {
         .andExpect(status().isOk())
         .andReturn().getResponse().getContentAsString();
 
-    assertEquals(responseBody, token);
+    assertEquals(responseBody, tokenStringObject);
   }
 }
