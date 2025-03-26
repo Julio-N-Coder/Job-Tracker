@@ -80,6 +80,11 @@ class JobTrackerApplicationTests {
 	private static final UUID jobId = UUID.fromString("11111111-1111-1111-1111-111111111111");
 	private static final Job testJob = new Job(jobId, "TestJobTitle", "TestCompany", "TestStatus", LocalDateTime.now(),
 			userId);
+	private static final UUID oldJobId = UUID.fromString("21111111-1111-1111-1111-111111111111");
+	private static final UUID oldUserId = UUID.fromString("22111111-1111-1111-1111-111111111111");
+	private static final User oldUser = new User(oldUserId, "OldUserName", "password");
+	private static final Job oldJob = new Job(oldJobId, "OldJobTitle", "OldCompany", "OldStatus", LocalDateTime.now(),
+			oldUserId);
 
 	@BeforeAll
 	static void setUp(@Autowired JwtUtil jwtUtil, @Autowired JdbcClient jdbcClient,
@@ -210,13 +215,8 @@ class JobTrackerApplicationTests {
 
 	@Test
 	void updateJobTest() throws Exception {
-		UUID oldJobId = UUID.fromString("21111111-1111-1111-1111-111111111111");
-		UUID oldUserId = UUID.fromString("22111111-1111-1111-1111-111111111111");
-
-		User oldUser = new User(oldUserId, "OldUserName", "password");
 		saveUserWithClient(oldUser);
 
-		Job oldJob = new Job(oldJobId, "OldJobTitle", "OldCompany", "OldStatus", LocalDateTime.now(), oldUserId);
 		RequestJob updatedRequestJob = new RequestJob("UpdatedJobTitle", "UpdatedCompany", "Updatedstatus");
 
 		saveJobWithClient(oldJob);
@@ -238,13 +238,7 @@ class JobTrackerApplicationTests {
 
 	@Test
 	void deleteJobTest() throws Exception {
-		UUID oldJobId = UUID.fromString("21111111-1111-1111-1111-111111111111");
-		UUID oldUserId = UUID.fromString("22111111-1111-1111-1111-111111111111");
-
-		User oldUser = new User(oldUserId, "OldUserName", "password");
 		saveUserWithClient(oldUser);
-
-		Job oldJob = new Job(oldJobId, "OldJobTitle", "OldCompany", "OldStatus", LocalDateTime.now(), oldUserId);
 
 		saveJobWithClient(oldJob);
 
@@ -253,6 +247,35 @@ class JobTrackerApplicationTests {
 				.andExpect(status().isOk());
 
 		assertTrue(jobRepository.findById(oldJobId).isEmpty(), "Job Was not deleted");
+		userRepository.delete(oldUser);
+	}
+
+	/* User Controller Test */
+	@Test
+	void getUser() throws Exception {
+		String responseUser = mvc.perform(get("/user")
+				.header("Authorization", "Bearer " + token))
+				.andExpect(status().isOk())
+				.andReturn().getResponse().getContentAsString();
+
+		ResponseUser user = objectMapper.readValue(responseUser, ResponseUser.class);
+
+		assertEquals(userId, user.id(), "User ID does not match");
+		assertEquals(userName, user.username(), "Username does not match");
+	}
+
+	@Test
+	void deleteUserAccountTest() throws Exception {
+		saveUserWithClient(oldUser);
+		saveJobWithClient(oldJob);
+
+		mvc.perform(delete("/user")
+				.header("Authorization", "Bearer " + jwtUtil.generateToken(oldUserId)))
+				.andExpect(status().isOk());
+
+		assertTrue(jobRepository.findById(oldJobId).isEmpty(), "Job Was not deleted");
+		assertTrue(userRepository.findById(oldUserId).isEmpty(), "User was not deleted");
+		userRepository.delete(oldUser);
 	}
 
 	private void saveJobWithClient(Job job) {
@@ -279,6 +302,9 @@ class JobTrackerApplicationTests {
 }
 
 record TokenResponse(String token, String refresh_token) {
+}
+
+record ResponseUser(UUID id, String username) {
 }
 
 record RequestJob(
