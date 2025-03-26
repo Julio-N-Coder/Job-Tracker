@@ -47,9 +47,11 @@ export default function Card({
   return (
     <div className="bg-base-300 p-2 rounded text-lg flex gap-2">
       <div className="space-y-2" id={id} data-userid={userId}>
-        <h3 className="text-3xl text-center font-bold">{company}</h3>
-        <p>Job Title: {jobTitle}</p>
-        <p>Status: {status}</p>
+        <h3 className="text-2xl xsm:text-3xl text-center font-bold">
+          {company}
+        </h3>
+        <p className="break-all">Job Title: {jobTitle}</p>
+        <p className="break-all">Status: {status}</p>
         <div className="flex flex-col items-center">
           <p className="underline">Applied Date</p>
           <p>{appliedDate.toISOString().split("T")[0]}</p>
@@ -57,7 +59,7 @@ export default function Card({
       </div>
       <div className="flex flex-col justify-around">
         <button
-          className="btn btn-accent"
+          className="btn btn-sm xsm:btn-md btn-accent text-[15px]"
           onClick={() => {
             const dialog = document.getElementById(
               modelId
@@ -68,7 +70,10 @@ export default function Card({
         >
           Update
         </button>
-        <button className="btn btn-accent" onClick={deleteJob}>
+        <button
+          className="btn btn-sm xsm:btn-md btn-accent text-[15px]"
+          onClick={deleteJob}
+        >
           Delete
         </button>
       </div>
