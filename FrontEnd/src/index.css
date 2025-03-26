@@ -8,6 +8,10 @@
   @apply ring-0 text-3xl btn btn-soft
 }
 
+.small-nav-buttons {
+  @apply ring-0 btn btn-ghost text-lg
+}
+
 .responsive-model {
   @apply modal modal-bottom sm:modal-middle
 }

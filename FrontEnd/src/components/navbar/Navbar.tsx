@@ -1,7 +1,7 @@
 import { NavLink } from "react-router";
 import ThemeToggle from "./ThemeToggle";
 import { useNavigate } from "react-router";
-import { UserSvg } from "../svg/Svg";
+import { UserSvg, SmallNavDropDownSvg } from "../svg/Svg";
 
 export default function Navbar() {
   let navigation = useNavigate();
@@ -15,31 +15,27 @@ export default function Navbar() {
 
   return (
     <nav className="bg-base-300 p-2 flex justify-between">
-      <div className="flex gap-2">
-        <NavLink
-          to="/"
-          className={({ isActive }) =>
-            isActive ? "nav-buttons btn-active" : "nav-buttons"
-          }
-        >
-          Home
-        </NavLink>
-        <NavLink
-          to="/about"
-          className={({ isActive }) =>
-            isActive ? "nav-buttons btn-active" : "nav-buttons"
-          }
-        >
-          About
-        </NavLink>
-        <NavLink
-          to="/jobs-page"
-          className={({ isActive }) =>
-            isActive ? "nav-buttons btn-active" : "nav-buttons"
-          }
-        >
-          Job Tracker
-        </NavLink>
+      <div className="navbar-start md:hidden">
+        <div className="dropdown">
+          <div tabIndex={0} role="button" className="btn btn-circle">
+            <SmallNavDropDownSvg />
+          </div>
+          <div
+            tabIndex={0}
+            className="menu menu-sm p-1 dropdown-content bg-base-100 rounded-box z-1 w-52 shadow border-1"
+          >
+            <PageNavLinks
+              className="small-nav-buttons"
+              activeClassName="small-nav-buttons btn-active"
+            />
+          </div>
+        </div>
+      </div>
+      <div className="md:flex gap-2 hidden">
+        <PageNavLinks
+          className="nav-buttons"
+          activeClassName="nav-buttons btn-active"
+        />
       </div>
       <div className="flex items-center gap-2">
         <ThemeToggle />
@@ -55,6 +51,37 @@ export default function Navbar() {
         )}
       </div>
     </nav>
+  );
+}
+
+function PageNavLinks({
+  className,
+  activeClassName,
+}: {
+  className: string;
+  activeClassName: string;
+}) {
+  return (
+    <>
+      <NavLink
+        to="/"
+        className={({ isActive }) => (isActive ? activeClassName : className)}
+      >
+        Home
+      </NavLink>
+      <NavLink
+        to="/about"
+        className={({ isActive }) => (isActive ? activeClassName : className)}
+      >
+        About
+      </NavLink>
+      <NavLink
+        to="/jobs-page"
+        className={({ isActive }) => (isActive ? activeClassName : className)}
+      >
+        Job Tracker
+      </NavLink>
+    </>
   );
 }
 
