@@ -3,6 +3,9 @@
 @plugin "daisyui" {
   themes: all;
 }
+@theme {
+  --breakpoint-xsm: 440px;
+}
 
 .nav-buttons {
   @apply ring-0 text-3xl btn btn-soft
