@@ -25,6 +25,7 @@ public class SecurityConfig {
     http.authorizeHttpRequests((authorize) -> authorize
         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
         .requestMatchers("/auth/**").permitAll()
+        .requestMatchers("/actuator/health").permitAll()
         .anyRequest().authenticated())
         .csrf(csrf -> csrf.disable())
         .addFilterAfter(jwtFilter, AnonymousAuthenticationFilter.class);

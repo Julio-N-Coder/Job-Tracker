@@ -63,6 +63,6 @@ public class JWTFilter extends OncePerRequestFilter {
     String path = request.getServletPath();
     String method = request.getMethod();
 
-    return "OPTIONS".equals(method) || path.startsWith("/auth/");
+    return "OPTIONS".equals(method) || path.startsWith("/auth/") || path.startsWith("/actuator/");
   }
 }
