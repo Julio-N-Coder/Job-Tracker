@@ -46,7 +46,15 @@ def run_selenium_tests():
 
 
 def cleanup():
-    print("cleanup not set up")
+    print("Cleaning up resources")
+    # Shut down processes
+    processes[FRONT_END_PID].terminate()
+    processes[SPRING_BOOT_PID].terminate()
+
+    # Clean up docker services
+    subprocess.run(["docker", "stop", CONTAINER_DB_NAME])
+    subprocess.run(["docker", "network", "rm", DOCKER_NETWORK_NAME])
+    subprocess.run(["docker", "rm", "-v", CONTAINER_DB_NAME])
 
 
 BACKEND_APP_URL = "http://localhost:8080"
@@ -125,6 +133,7 @@ def main():
         stderr=subprocess.PIPE,
     )
     FRONT_END_PID = front_end_proc.pid
+    processes[FRONT_END_PID] = front_end_proc
 
     mvn = os.path.join(PROJECT_DIR, "mvnw")
     # build sprint boot application
@@ -152,14 +161,14 @@ def main():
         text=True,
     )
     SPRING_BOOT_PID = spring_proc.pid
+    processes[SPRING_BOOT_PID] = spring_proc
 
-    # Wait for application to be ready
+    # Wait for application to be ready, then run test
     if wait_for_spring_boot_app(BACKEND_APP_URL):
         run_selenium_tests()
     else:
         print("Could not start Selenium tests - application not ready")
 
-    # save background task to hashmap and use that to stop resources
     cleanup()
 
 
