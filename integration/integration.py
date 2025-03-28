@@ -4,6 +4,21 @@ import subprocess
 import os
 import sys
 
+BACKEND_APP_URL = "http://localhost:8080"
+FRONT_END_URL_FROM_CONTAINER = "http://host.docker.internal:4173"
+FILE_DIR = os.path.abspath(os.path.dirname(__file__))
+PROJECT_DIR = os.path.dirname(FILE_DIR)
+FRONT_END_DIR = os.path.join(PROJECT_DIR, "FrontEnd")
+
+POSTGRES_DB = "mydatabase"
+POSTGRES_PASSWORD = "secret"
+POSTGRES_USER = "myuser"
+
+FRONT_END_PID = None
+SPRING_BOOT_PID = None
+
+processes = {}
+
 
 def wait_for_spring_boot_app(url, timeout=60, check_interval=2):
     """
@@ -45,34 +60,27 @@ def run_selenium_tests():
     print("make selenium test here")
 
 
+def run_compose_file(action: str, *extra) -> int:
+    cmd = [
+        "docker",
+        "compose",
+        "--file",
+        os.path.join(FILE_DIR, "compose.yaml"),
+        action,
+    ]
+    cmd.extend(extra)
+
+    return subprocess.run(cmd).returncode
+
+
 def cleanup():
     print("Cleaning up resources")
     # Shut down processes
     processes[FRONT_END_PID].terminate()
     processes[SPRING_BOOT_PID].terminate()
 
-    # Clean up docker services
-    subprocess.run(["docker", "stop", CONTAINER_DB_NAME])
-    subprocess.run(["docker", "network", "rm", DOCKER_NETWORK_NAME])
-    subprocess.run(["docker", "rm", "-v", CONTAINER_DB_NAME])
-
-
-BACKEND_APP_URL = "http://localhost:8080"
-FILE_DIR = os.path.abspath(os.path.dirname(__file__))
-PROJECT_DIR = os.path.dirname(FILE_DIR)
-FRONT_END_DIR = os.path.join(PROJECT_DIR, "FrontEnd")
-
-CONTAINER_DB_NAME = "postgres-db-test-90134"
-DOCKER_NETWORK_NAME = "postgres-db-test-network-q41348"
-
-POSTGRES_DB = "mydatabase"
-POSTGRES_PASSWORD = "secret"
-POSTGRES_USER = "myuser"
-
-FRONT_END_PID = None
-SPRING_BOOT_PID = None
-
-processes = {}
+    run_compose_file("stop")
+    # run_compose_file("down", "--volumes")
 
 
 def main():
@@ -83,40 +91,10 @@ def main():
         print(error_message, file=sys.stderr)
         sys.exit(1)
 
-    # create docker network
-    network_res = subprocess.run(
-        ["docker", "network", "create", "--driver", "bridge", DOCKER_NETWORK_NAME],
-        text=True,
-    )
-
-    if network_res.returncode != 0:
-        exit_with_error("Failed to create docker network")
-
-    # Start postgresql container
-    db_res = subprocess.run(
-        [
-            "docker",
-            "run",
-            "--name",
-            CONTAINER_DB_NAME,
-            "--publish",
-            "5432:5432",
-            "--network",
-            DOCKER_NETWORK_NAME,
-            "-e",
-            f"POSTGRES_DB={POSTGRES_DB}",
-            "-e",
-            f"POSTGRES_PASSWORD={POSTGRES_PASSWORD}",
-            "-e",
-            f"POSTGRES_USER={POSTGRES_USER}",
-            "-d",
-            "postgres:latest",
-        ],
-        text=True,
-    )
-
-    if db_res.returncode != 0:
-        exit_with_error("Failed to create postgres container")
+    # start docker compose file
+    composeStatus = run_compose_file("up", "--detach")
+    if composeStatus != 0:
+        exit_with_error("Failed to start docker compose file")
 
     # build and Start front end app
     frontEndBuildResult = subprocess.run(

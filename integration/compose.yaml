@@ -1,0 +1,17 @@
+name: job-tracker-intagration-test
+services:
+  postgres:
+    container_name: postgres-db-test-90134
+    image: "postgres:latest"
+    environment:
+      - "POSTGRES_DB=mydatabase"
+      - "POSTGRES_PASSWORD=secret"
+      - "POSTGRES_USER=myuser"
+    ports:
+      - "5432:5432"
+    networks:
+      - job-tracker-network
+
+networks:
+  job-tracker-network:
+    name: job-tracker-intagration-network
