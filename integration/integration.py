@@ -3,6 +3,8 @@ import time
 import subprocess
 import os
 import sys
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
 
 BACKEND_APP_URL = "http://localhost:8080"
 FRONT_END_URL_FROM_CONTAINER = "http://host.docker.internal:4173"
@@ -57,7 +59,21 @@ def run_selenium_tests():
     """
     Function to run Selenium tests after app is ready
     """
-    print("make selenium test here")
+    try:
+        driver = webdriver.Remote(
+            command_executor="http://localhost:4444/wd/hub",
+            options=Options(),
+        )
+
+        driver.get(FRONT_END_URL_FROM_CONTAINER)
+
+        # Perform test actions
+        print("Page Title: ", driver.title)
+    except Exception as e:
+        print(f"An error occurred during Selenium tests: {e}")
+    finally:
+        driver.quit()
+        print("Finished Running Test")
 
 
 def run_compose_file(action: str, *extra) -> int:
