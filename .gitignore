@@ -36,6 +36,7 @@ build/
 
 ### VS Code ###
 .vscode/
+!integration/.vscode
 
 ### FrontEnd ###
 # Logs
