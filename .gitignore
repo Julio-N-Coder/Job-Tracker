@@ -7,6 +7,7 @@ NOTES.md
 keys/*
 !keys/.gitkeep
 src/main/resources/application-prod.properties
+integration/.venv_integration
 
 ### STS ###
 .apt_generated
