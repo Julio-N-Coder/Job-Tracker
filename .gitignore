@@ -8,6 +8,7 @@ keys/*
 !keys/.gitkeep
 src/main/resources/application-prod.properties
 integration/.venv_integration
+integration/screenshots
 
 ### STS ###
 .apt_generated
@@ -35,8 +36,8 @@ build/
 !**/src/test/**/build/
 
 ### VS Code ###
-.vscode/
-!integration/.vscode
+.vscode/*
+!.vscode/settings.json
 
 ### FrontEnd ###
 # Logs
@@ -54,7 +55,6 @@ dist-ssr
 *.local
 
 # Editor directories and files
-.vscode/*
 !.vscode/extensions.json
 .idea
 .DS_Store

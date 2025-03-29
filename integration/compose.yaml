@@ -16,7 +16,6 @@ services:
   chrome:
     image: selenium/node-chrome:latest
     container_name: selenium-chrome-node
-    shm_size: 2gb
     depends_on:
       - selenium-hub
     environment:
