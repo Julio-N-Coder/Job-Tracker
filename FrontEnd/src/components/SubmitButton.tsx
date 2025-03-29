@@ -8,7 +8,7 @@ export default function SubmitButton({
   return (
     <button
       type="submit"
-      id={id ? "submit-button" : id}
+      id={id ? id : "submit-button"}
       className="btn btn-accent text-lg w-32"
       disabled={isSubmiting}
     >

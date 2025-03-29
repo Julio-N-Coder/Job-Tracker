@@ -5,6 +5,9 @@ import os
 import sys
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
 BACKEND_APP_URL = "http://localhost:8080"
 FRONT_END_URL_FROM_CONTAINER = "http://host.docker.internal:4173"
@@ -60,17 +63,54 @@ def run_selenium_tests():
     Function to run Selenium tests after app is ready
     """
     try:
+        # Create screenshots directory if it doesn't exist
+        screenshots_dir = os.path.join(FILE_DIR, "screenshots")
+        os.makedirs(screenshots_dir, exist_ok=True)
+
         driver = webdriver.Remote(
             command_executor="http://localhost:4444/wd/hub",
             options=Options(),
         )
 
-        driver.get(FRONT_END_URL_FROM_CONTAINER)
+        # Go to signup page
+        driver.get(f"{FRONT_END_URL_FROM_CONTAINER}/signup")
+        wait = WebDriverWait(driver, 3)
+
+        # Wait for login input to load and signin
+        userInput = wait.until(EC.element_to_be_clickable((By.ID, "username")))
+        userInput.send_keys("TestUser")
+
+        password_input = driver.find_element(By.ID, "password")
+        password_input.send_keys("Password")
+
+        submitButton = driver.find_element(By.ID, "submit-button")
+        submitButton.click()
+
+        # Wait for jobs page to load and add job
+        wait.until(EC.element_to_be_clickable((By.ID, "add-job-button"))).click()
+        companyInput = wait.until(
+            EC.element_to_be_clickable((By.ID, "Add-company-input"))
+        )
+        companyInput.send_keys("CompanyName")
+
+        jobTitleInput = driver.find_element(By.ID, "Add-job-title-input")
+        jobTitleInput.send_keys("JobTitle")
+
+        addSubmitButton = driver.find_element(By.ID, "Add-submit-button")
+        addSubmitButton.click()
+
+        # for now sleeping
+        # use connect to postgres and validate data
+        time.sleep(2)
+
+        # Save a screenshot
+        driver.save_screenshot(os.path.join(FILE_DIR, "screenshots", "test.png"))
 
         # Perform test actions
         print("Page Title: ", driver.title)
     except Exception as e:
         print(f"An error occurred during Selenium tests: {e}")
+        driver.save_screenshot(os.path.join(FILE_DIR, "screenshots", "error.png"))
     finally:
         driver.quit()
         print("Finished Running Test")
@@ -96,7 +136,7 @@ def cleanup():
     processes[SPRING_BOOT_PID].terminate()
 
     run_compose_file("stop")
-    # run_compose_file("down", "--volumes")
+    run_compose_file("down", "--volumes")
 
 
 def main():
@@ -114,7 +154,8 @@ def main():
 
     # build and Start front end app
     frontEndBuildResult = subprocess.run(
-        ["npm", "--prefix", FRONT_END_DIR, "run", "build-local"], text=True
+        ["npm", "--prefix", FRONT_END_DIR, "run", "build-for-container"],
+        text=True,
     )
 
     if frontEndBuildResult.returncode != 0:

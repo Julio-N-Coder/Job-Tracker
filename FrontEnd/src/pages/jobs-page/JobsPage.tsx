@@ -51,6 +51,7 @@ export default function JobsPage() {
         <h2 className="font-bold text-2xl">Jobs</h2>
         <button
           className="btn btn-accent text-xl"
+          id="add-job-button"
           onClick={() =>
             (document.getElementById(addJobId) as HTMLDialogElement).showModal()
           }
@@ -58,7 +59,10 @@ export default function JobsPage() {
           Add Job
         </button>
       </div>
-      <div className="p-2 flex justify-around flex-wrap gap-2">
+      <div
+        className="p-2 flex justify-around flex-wrap gap-2"
+        id="jobs-container"
+      >
         {/* display jobs card data */}
         {jobs.map((job, index) => (
           <Card
