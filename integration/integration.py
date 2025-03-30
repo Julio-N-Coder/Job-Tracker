@@ -8,6 +8,7 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+import psycopg2
 
 BACKEND_APP_URL = "http://localhost:8080"
 FRONT_END_URL_FROM_CONTAINER = "http://host.docker.internal:4173"
@@ -58,11 +59,27 @@ def wait_for_spring_boot_app(url, timeout=60, check_interval=2):
     return False
 
 
+def connect_to_database():
+    """
+    Connect to the database and return the connection object.
+    """
+    return psycopg2.connect(
+        host="localhost",
+        database=POSTGRES_DB,
+        user=POSTGRES_USER,
+        password=POSTGRES_PASSWORD,
+        port="5432",
+    )
+
+
 def run_selenium_tests():
     """
     Function to run Selenium tests after app is ready
     """
     try:
+        connection = connect_to_database()
+        cursor = connection.cursor()
+
         # Create screenshots directory if it doesn't exist
         screenshots_dir = os.path.join(FILE_DIR, "screenshots")
         os.makedirs(screenshots_dir, exist_ok=True)
@@ -86,33 +103,78 @@ def run_selenium_tests():
         submitButton = driver.find_element(By.ID, "submit-button")
         submitButton.click()
 
-        # Wait for jobs page to load and add job
-        wait.until(EC.element_to_be_clickable((By.ID, "add-job-button"))).click()
-        companyInput = wait.until(
-            EC.element_to_be_clickable((By.ID, "Add-company-input"))
-        )
-        companyInput.send_keys("CompanyName")
+        # loop through to add multiple jobs
+        jobs_ammount = 4
+        print(jobs_ammount, "Total Jobs")
+        for job_number in range(jobs_ammount):
+            wait.until(EC.element_to_be_clickable((By.ID, "add-job-button"))).click()
+            companyInput = wait.until(
+                EC.element_to_be_clickable((By.ID, "Add-company-input"))
+            )
+            companyInput.send_keys(f"CompanyName-{job_number}")
 
-        jobTitleInput = driver.find_element(By.ID, "Add-job-title-input")
-        jobTitleInput.send_keys("JobTitle")
+            jobTitleInput = driver.find_element(By.ID, "Add-job-title-input")
+            jobTitleInput.send_keys(f"JobTitle-{job_number}")
 
-        addSubmitButton = driver.find_element(By.ID, "Add-submit-button")
-        addSubmitButton.click()
+            addSubmitButton = driver.find_element(By.ID, "Add-submit-button")
+            addSubmitButton.click()
 
-        # for now sleeping
-        # use connect to postgres and validate data
-        time.sleep(2)
+            # Wait for page reload
+            time.sleep(0.25)
 
-        # Save a screenshot
-        driver.save_screenshot(os.path.join(FILE_DIR, "screenshots", "test.png"))
+        # Wait for the element to be in the database
+        max_retries = 5
+        retry_delay = 1
+        rows = None
 
-        # Perform test actions
-        print("Page Title: ", driver.title)
+        for attempt in range(max_retries):
+            cursor.execute("SELECT * FROM jobs")
+            rows = cursor.fetchall()
+            if rows:
+                break
+            print(f"Retrying database fetch... Attempt {attempt + 1}/{max_retries}")
+            time.sleep(retry_delay)
+
+        if not rows:
+            raise Exception("Failed to fetch job data from the database after retries")
+
+        for test_number, jobData in enumerate(rows):
+            test_number += 1
+            jobId = jobData[0]
+
+            jobCard = wait.until(EC.element_to_be_clickable((By.ID, jobId)))
+            # Validate the job data from the database against the UI elements
+            job_card_children = jobCard.find_elements(By.XPATH, "./*")
+            company = job_card_children[0].text
+            jobTitle = job_card_children[1].text.split(": ")[1]
+            jobStatus = job_card_children[2].text.split(": ")[1]
+
+            db_job_title = jobData[1]
+            db_company = jobData[2]
+            db_job_status = jobData[3]
+
+            if company != db_company:
+                raise Exception(f"Company mismatch: {company} != {db_company}")
+            if jobTitle != db_job_title:
+                raise Exception(f"Job title mismatch: {jobTitle} != {db_job_title}")
+            if jobStatus != db_job_status:
+                raise Exception(f"Job status mismatch: {jobStatus} != {db_job_status}")
+            print("Job", test_number, "Passed!")
+
+        print("Test passed Succesfully!")
+
+        # Save a screenshot of the jobs page
+        driver.save_screenshot(os.path.join(FILE_DIR, "screenshots", "jobs.png"))
+
+    except psycopg2.DatabaseError as db_error:
+        print(f"Database error occurred: {db_error}", file=sys.stderr)
     except Exception as e:
-        print(f"An error occurred during Selenium tests: {e}")
+        print(f"An error occurred during Selenium tests: {e}", file=sys.stderr)
         driver.save_screenshot(os.path.join(FILE_DIR, "screenshots", "error.png"))
     finally:
         driver.quit()
+        cursor.close()
+        connection.close()
         print("Finished Running Test")
 
 
